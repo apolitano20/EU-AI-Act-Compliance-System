@@ -37,4 +37,10 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Obligations Matrix", href: "/obligations" },
     ],
   },
+  {
+    label: "Readiness",
+    items: [
+      { label: "Evidence & Readiness", href: "/readiness" },
+    ],
+  },
 ];

@@ -24,6 +24,7 @@ import { buildReclassificationAssessment, deriveReclassificationAnswers, RECLASS
 import { buildGpaiAssessment, deriveGpaiAnswers, GPAI_QUESTIONS, type GpaiAssessment } from "@/lib/gpai/rules";
 import { buildTransparencyAssessment, deriveTransparencyAnswers, TRANSPARENCY_QUESTIONS, type TransparencyAssessment } from "@/lib/transparency/rules";
 import { applyReclassification, buildObligationAssessment, OBLIGATION_QUESTIONS, type ObligationContext, type ObligationMatrixAssessment } from "@/lib/obligations/obligationRules";
+import { buildReadinessAssessment, sanitizeEvidenceAnswers, type ReadinessAssessment } from "@/lib/evidence/evidenceRules";
 
 export type SystemWithAssessments = AISystem & {
   roleAssessment: EntityRoleAssessment | null;
@@ -66,6 +67,9 @@ export interface AssessmentBundle {
   obligationAnswers: ModuleAnswers;
   obligationContext: ObligationContext;
   obligations: ObligationMatrixAssessment;
+  /** Module 13 — evidence & readiness (per Module 12 obligation row). */
+  evidenceAnswers: ModuleAnswers;
+  readiness: ReadinessAssessment;
 }
 
 /** Stored answers for one module, or {} when nothing was saved. */
@@ -206,6 +210,18 @@ export function computeAssessmentBundle(system: SystemWithAssessments): Assessme
   };
   const obligations = buildObligationAssessment(obligationContext, obligationAnswers);
 
+  // Module 13 — evidence answers are keyed by obligation_id (dynamic sanitizer).
+  const evidenceRecord = system.moduleAssessments.find((a) => a.moduleKey === "readiness");
+  let evidenceAnswers: ModuleAnswers = {};
+  if (evidenceRecord?.answers) {
+    try {
+      evidenceAnswers = sanitizeEvidenceAnswers(JSON.parse(evidenceRecord.answers));
+    } catch {
+      evidenceAnswers = {};
+    }
+  }
+  const readiness = buildReadinessAssessment(obligations, evidenceAnswers);
+
   return {
     system, normalized, roleAnswers, role, definition,
     scopeAnswers, scope, exclusionAnswers, exclusions,
@@ -213,6 +229,7 @@ export function computeAssessmentBundle(system: SystemWithAssessments): Assessme
     literacyAnswers, literacy, reclassificationAnswers, reclassification,
     gpaiAnswers, gpai, transparencyAnswers, transparency,
     obligationAnswers, obligationContext, obligations,
+    evidenceAnswers, readiness,
   };
 }
 

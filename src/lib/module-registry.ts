@@ -14,6 +14,7 @@ import { RECLASSIFICATION_QUESTIONS } from "./reclassification/reclassificationR
 import { GPAI_QUESTIONS } from "./gpai/rules";
 import { TRANSPARENCY_QUESTIONS } from "./transparency/rules";
 import { OBLIGATION_QUESTIONS } from "./obligations/obligationRules";
+import { sanitizeEvidenceAnswers } from "./evidence/evidenceRules";
 
 export type ModuleKey =
   | "eu-scope"
@@ -49,6 +50,8 @@ export const MODULES: Partial<Record<ModuleKey, ModuleDefinition>> = {
   gpai: { title: "GPAI Obligations", route: "/gpai", questions: GPAI_QUESTIONS },
   transparency: { title: "Transparency Obligations", route: "/transparency", questions: TRANSPARENCY_QUESTIONS },
   obligations: { title: "Obligations Matrix", route: "/obligations", questions: OBLIGATION_QUESTIONS },
+  // Module 13's answers are keyed by obligation_id, so it uses a dynamic sanitizer.
+  readiness: { title: "Evidence & Readiness", route: "/readiness", questions: [], sanitize: sanitizeEvidenceAnswers },
 };
 
 export function getModuleDefinition(moduleKey: string): ModuleDefinition | undefined {
