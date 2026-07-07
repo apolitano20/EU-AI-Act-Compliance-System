@@ -17,6 +17,8 @@ import { parseAnswers as parseRoleAnswers } from "@/lib/entity-type/assessment-s
 import { buildAiDefinitionAssessment, type AiDefinitionAssessment } from "@/lib/ai-system-definition/definitionRules";
 import { buildScopeAssessment, deriveScopeAnswers, SCOPE_QUESTIONS, type EuScopeAssessment } from "@/lib/eu-scope/scopeRules";
 import { buildExclusionAssessment, deriveExclusionAnswers, EXCLUSION_QUESTIONS, type ExclusionAssessment } from "@/lib/exclusions/exclusionRules";
+import { buildProhibitedAssessment, deriveProhibitedAnswers, PROHIBITED_QUESTIONS, type ProhibitedAssessment } from "@/lib/prohibited/rules";
+import { buildHighRiskAssessment, deriveHighRiskAnswers, HIGH_RISK_QUESTIONS, type HighRiskAssessment } from "@/lib/high-risk/rules";
 
 export type SystemWithAssessments = AISystem & {
   roleAssessment: EntityRoleAssessment | null;
@@ -37,6 +39,12 @@ export interface AssessmentBundle {
   /** Module 5 — exclusions (Article 2 carve-outs). */
   exclusionAnswers: ModuleAnswers;
   exclusions: ExclusionAssessment;
+  /** Module 6 — prohibited practices (Article 5). */
+  prohibitedAnswers: ModuleAnswers;
+  prohibited: ProhibitedAssessment;
+  /** Module 7 — high-risk classification (Article 6, Annex I/III). */
+  highRiskAnswers: ModuleAnswers;
+  highRisk: HighRiskAssessment;
 }
 
 /** Stored answers for one module, or {} when nothing was saved. */
@@ -78,7 +86,38 @@ export function computeAssessmentBundle(system: SystemWithAssessments): Assessme
   };
   const exclusions = buildExclusionAssessment(normalized, exclusionAnswers);
 
-  return { system, normalized, roleAnswers, role, definition, scopeAnswers, scope, exclusionAnswers, exclusions };
+  // Module 6 — prohibited practices (short-circuits on a full Module 5 exclusion).
+  const prohibitedAnswers: ModuleAnswers = {
+    ...deriveProhibitedAnswers(normalized),
+    ...storedModuleAnswers(system, "prohibited", PROHIBITED_QUESTIONS),
+  };
+  const prohibited = buildProhibitedAssessment(normalized, prohibitedAnswers, {
+    fullyExcluded: exclusions.fullExclusion,
+    exclusionStatus: exclusions.status,
+  });
+
+  // Module 7 — high-risk (runs only for non-excluded, non-prohibited systems).
+  const highRiskAnswers: ModuleAnswers = {
+    ...deriveHighRiskAnswers(normalized, {
+      aiEmbeddedInProduct: roleAnswers.aiEmbeddedInProduct,
+      safetyRisk: roleAnswers.safetyRisk,
+    }),
+    ...storedModuleAnswers(system, "high-risk", HIGH_RISK_QUESTIONS),
+  };
+  const highRisk = buildHighRiskAssessment(normalized, highRiskAnswers, {
+    fullyExcluded: exclusions.fullExclusion,
+    likelyProhibited: prohibited.status === "likely_prohibited",
+    prohibitedStatus: prohibited.status,
+    rebrandedThirdPartySystem: roleAnswers.rebrandedThirdPartySystem,
+    substantiallyModifiedSystem: roleAnswers.substantiallyModifiedSystem,
+    changedIntendedPurpose: roleAnswers.changedIntendedPurpose,
+  });
+
+  return {
+    system, normalized, roleAnswers, role, definition,
+    scopeAnswers, scope, exclusionAnswers, exclusions,
+    prohibitedAnswers, prohibited, highRiskAnswers, highRisk,
+  };
 }
 
 export async function loadSystemsWithAssessments(): Promise<SystemWithAssessments[]> {

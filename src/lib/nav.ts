@@ -23,6 +23,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "AI System Definition", href: "/ai-system-definition" },
       { label: "EU Scope", href: "/eu-scope" },
       { label: "Exclusions", href: "/exclusions" },
+      { label: "Prohibited", href: "/prohibited" },
+      { label: "High-Risk", href: "/high-risk" },
     ],
   },
 ];
