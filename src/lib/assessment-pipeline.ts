@@ -21,6 +21,8 @@ import { buildProhibitedAssessment, deriveProhibitedAnswers, PROHIBITED_QUESTION
 import { buildHighRiskAssessment, deriveHighRiskAnswers, HIGH_RISK_QUESTIONS, type HighRiskAssessment } from "@/lib/high-risk/rules";
 import { buildLiteracyAssessment, deriveLiteracyAnswers, LITERACY_QUESTIONS, type LiteracyAssessment } from "@/lib/ai-literacy/literacyRules";
 import { buildReclassificationAssessment, deriveReclassificationAnswers, RECLASSIFICATION_QUESTIONS, type ReclassificationAssessment } from "@/lib/reclassification/reclassificationRules";
+import { buildGpaiAssessment, deriveGpaiAnswers, GPAI_QUESTIONS, type GpaiAssessment } from "@/lib/gpai/rules";
+import { buildTransparencyAssessment, deriveTransparencyAnswers, TRANSPARENCY_QUESTIONS, type TransparencyAssessment } from "@/lib/transparency/rules";
 
 export type SystemWithAssessments = AISystem & {
   roleAssessment: EntityRoleAssessment | null;
@@ -53,6 +55,12 @@ export interface AssessmentBundle {
   /** Module 9 — value-chain reclassification (Article 25, authoritative trigger flags). */
   reclassificationAnswers: ModuleAnswers;
   reclassification: ReclassificationAssessment;
+  /** Module 10 — GPAI obligations (Art 51/53/55). */
+  gpaiAnswers: ModuleAnswers;
+  gpai: GpaiAssessment;
+  /** Module 11 — transparency (Art 50) + FRIA (Art 27). */
+  transparencyAnswers: ModuleAnswers;
+  transparency: TransparencyAssessment;
 }
 
 /** Stored answers for one module, or {} when nothing was saved. */
@@ -150,11 +158,29 @@ export function computeAssessmentBundle(system: SystemWithAssessments): Assessme
     purposeChangeReported: roleAnswers.changedIntendedPurpose === "Yes",
   });
 
+  // Module 10 — GPAI obligations.
+  const gpaiAnswers: ModuleAnswers = {
+    ...deriveGpaiAnswers(normalized, { fineTunedOrRetrainedModel: roleAnswers.fineTunedOrRetrainedModel }),
+    ...storedModuleAnswers(system, "gpai", GPAI_QUESTIONS),
+  };
+  const gpai = buildGpaiAssessment(gpaiAnswers);
+
+  // Module 11 — transparency (Art 50) + FRIA (Art 27, distinct panel).
+  const transparencyAnswers: ModuleAnswers = {
+    ...deriveTransparencyAnswers(normalized, { likelyRoles: role.likelyRoles }),
+    ...storedModuleAnswers(system, "transparency", TRANSPARENCY_QUESTIONS),
+  };
+  const transparency = buildTransparencyAssessment(normalized, transparencyAnswers, {
+    highRiskStatus: highRisk.status,
+    roleConfidenceLabel: role.confidenceLabel,
+  });
+
   return {
     system, normalized, roleAnswers, role, definition,
     scopeAnswers, scope, exclusionAnswers, exclusions,
     prohibitedAnswers, prohibited, highRiskAnswers, highRisk,
     literacyAnswers, literacy, reclassificationAnswers, reclassification,
+    gpaiAnswers, gpai, transparencyAnswers, transparency,
   };
 }
 

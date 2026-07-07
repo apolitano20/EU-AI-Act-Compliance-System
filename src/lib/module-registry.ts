@@ -11,6 +11,8 @@ import { PROHIBITED_QUESTIONS } from "./prohibited/rules";
 import { HIGH_RISK_QUESTIONS } from "./high-risk/rules";
 import { LITERACY_QUESTIONS } from "./ai-literacy/literacyRules";
 import { RECLASSIFICATION_QUESTIONS } from "./reclassification/reclassificationRules";
+import { GPAI_QUESTIONS } from "./gpai/rules";
+import { TRANSPARENCY_QUESTIONS } from "./transparency/rules";
 
 export type ModuleKey =
   | "eu-scope"
@@ -43,6 +45,8 @@ export const MODULES: Partial<Record<ModuleKey, ModuleDefinition>> = {
   "high-risk": { title: "High-Risk Classification", route: "/high-risk", questions: HIGH_RISK_QUESTIONS },
   "ai-literacy": { title: "AI Literacy", route: "/ai-literacy", questions: LITERACY_QUESTIONS },
   reclassification: { title: "Value-Chain Reclassification", route: "/reclassification", questions: RECLASSIFICATION_QUESTIONS },
+  gpai: { title: "GPAI Obligations", route: "/gpai", questions: GPAI_QUESTIONS },
+  transparency: { title: "Transparency Obligations", route: "/transparency", questions: TRANSPARENCY_QUESTIONS },
 };
 
 export function getModuleDefinition(moduleKey: string): ModuleDefinition | undefined {
