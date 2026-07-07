@@ -69,7 +69,8 @@ model AISystem {
   // Computed
   completenessScore Int?
 
-  roleAssessment EntityRoleAssessment?
+  roleAssessment    EntityRoleAssessment?
+  moduleAssessments ModuleAssessment[]
 }
 
 model EntityRoleAssessment {
@@ -81,4 +82,22 @@ model EntityRoleAssessment {
   updatedAt      DateTime @updatedAt
 
   system AISystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+}
+
+// Generic stored-answers overlay for Modules 4-13 (one row per system x module).
+// `answers` is a JSON object keyed by the module's question keys (Module 13 keys
+// by obligation_id). Assessments themselves are always recomputed live from
+// these answers + AISystem data — only the answers are persisted.
+model ModuleAssessment {
+  id             String   @id @default(cuid())
+  systemId       String
+  moduleKey      String // see ModuleKey in src/lib/module-registry.ts
+  answers        String // JSON object keyed by the module's question keys
+  lastAssessedAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  system AISystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+
+  @@unique([systemId, moduleKey])
 }

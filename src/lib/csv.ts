@@ -31,6 +31,13 @@ export function downloadCSVFile(csv: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+// Builds a CSV string from a header row and data rows, escaping every cell.
+export function buildCsv(header: readonly string[], rows: readonly (readonly unknown[])[]): string {
+  const head = header.map(csvEscape).join(",");
+  const body = rows.map((row) => row.map(csvEscape).join(","));
+  return [head, ...body].join("\r\n");
+}
+
 export function toCSV(rows: AISystem[]): string {
   const header = HEADERS.join(",");
   const body = rows.map((row) => {

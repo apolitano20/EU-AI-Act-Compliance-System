@@ -58,7 +58,10 @@ export type NormalizedAISystemFormData = Omit<AISystemFormData, ArrayFieldName> 
   [K in ArrayFieldName]-?: NonNullable<AISystemFormData[K]>;
 };
 
-export type AISystemMutationData = Omit<Prisma.AISystemCreateInput, "id" | "createdAt" | "updatedAt" | "roleAssessment">;
+export type AISystemMutationData = Omit<
+  Prisma.AISystemCreateInput,
+  "id" | "createdAt" | "updatedAt" | "roleAssessment" | "moduleAssessments"
+>;
 
 type AISystemLike = Partial<Record<keyof AISystemFormData, unknown>>;
 

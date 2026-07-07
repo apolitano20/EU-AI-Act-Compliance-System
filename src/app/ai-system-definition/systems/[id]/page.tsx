@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Disclaimer } from "@/components/shared/disclaimer";
 import Link from "next/link";
 import { getAiDefinitionRow } from "@/lib/ai-system-definition/store";
 import { needsModule2ConsistencyWarning } from "@/lib/ai-system-definition/types";
@@ -64,9 +65,7 @@ export default async function AiSystemDefinitionDetailPage({ params }: { params:
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800">
-        This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.
-      </div>
+      <Disclaimer />
 
       {needsModule2ConsistencyWarning(result) && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex items-start gap-2 text-sm text-amber-800">

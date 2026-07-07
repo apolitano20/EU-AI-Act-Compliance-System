@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { DISCLAIMER_TEXT } from "@/lib/assessment-shared";
 import { saveAssessment } from "@/app/entity-type/actions";
 import { assessRole, QUESTIONS, SECTION_TITLES, type Answers, type Question } from "@/lib/entity-type/roleRules";
 import { RoleBadges, ConfidenceBadge, Article25Badge } from "./role-badges";
@@ -192,7 +193,7 @@ export function RoleQuestionnaire({ systemId, initialAnswers }: { systemId: stri
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-xs text-blue-800">
-          This tool supports EU AI Act readiness assessment. It does not provide legal advice. Results should be reviewed by qualified legal or compliance professionals before regulatory decisions are made.
+          {DISCLAIMER_TEXT}
         </div>
       </div>
     </div>

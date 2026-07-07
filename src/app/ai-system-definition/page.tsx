@@ -1,3 +1,4 @@
+import { Disclaimer } from "@/components/shared/disclaimer";
 import { listAiDefinitionRows } from "@/lib/ai-system-definition/store";
 import { DefinitionSummaryCards } from "@/components/ai-system-definition/definition-summary-cards";
 import { DefinitionTable } from "@/components/ai-system-definition/definition-table";
@@ -16,9 +17,7 @@ export default async function AiSystemDefinitionPage() {
         </p>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800 max-w-3xl">
-        This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.
-      </div>
+      <div className="mb-6 max-w-3xl"><Disclaimer /></div>
 
       <DefinitionSummaryCards rows={rows} />
       <DefinitionTable initialRows={rows} />
