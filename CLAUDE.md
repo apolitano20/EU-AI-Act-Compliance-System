@@ -11,7 +11,7 @@ npm run dev           # Next.js dev server (port 3000)
 npm run electron:dev  # Launch Electron (requires dev server already running)
 npm run build         # Production build (auto-runs prisma:generate)
 npm run lint          # ESLint
-npm run test          # Run src/lib/ai-system.test.ts via tsx (no framework)
+npm run test          # Chains all 15 tsx self-check test files (no framework)
 npm run db:seed       # Seed dev.db
 npm run db:reset      # Drop + re-seed (destructive)
 npm run db:repair     # Repair schema drift
@@ -29,19 +29,21 @@ npm run dist:mac      # Build macOS DMG
 
 **Database layer** (`src/lib/db.ts`): Prisma singleton using `@prisma/adapter-libsql`. Resolves DB from `DATABASE_FILE` (Electron) → `DATABASE_URL` (dev) → `file:./dev.db`. Never use `new PrismaClient()` directly — always import `prisma` from `@/lib/db`.
 
-**Prisma**: Version 7 uses the `prisma-client` generator (not `prisma-client-js`). Generated client lives in `src/generated/prisma/` — never edit those files. Run `npm run prisma:generate` after schema changes. Single model: `AISystem`. Array-typed fields (e.g. `countriesUsed`, `outputTypes`) are stored as JSON strings in SQLite.
+**Prisma**: Version 7 uses the `prisma-client` generator (not `prisma-client-js`). Generated client lives in `src/generated/prisma/` — never edit those files. Run `npm run prisma:generate` after schema changes. Models: `AISystem`, `EntityRoleAssessment` (Module 2 answers), `ModuleAssessment` (generic Modules 4-13 answers overlay, one row per system × moduleKey), `RemediationItem` (Module 14 workflow state). Array-typed fields (e.g. `countriesUsed`, `outputTypes`) are stored as JSON strings in SQLite.
 
 **Data flow**: Server Actions in `src/app/inventory/actions.ts` → `parseAISystemMutationInput` in `src/lib/ai-system-write.ts` → Prisma. All form validation uses the shared `aiSystemSchema` in `src/lib/schema.ts` (Zod 4).
+
+**Assessment pipeline (Modules 2-13)**: `src/lib/assessment-pipeline.ts` loads each system with its answer overlays in one query and recomputes every module's assessment live, in dependency order, as pure functions — assessments are never persisted, only questionnaire answers are (`ModuleAssessment`). Per-module pure rules live in `src/lib/<slug>/` with legal citations + guidance-status tags; shared types/conventions in `src/lib/assessment-shared.ts`; questionnaire registry + generic save action in `src/lib/module-registry.ts` / `src/app/assessments/actions.ts`. Module 14 persists `RemediationItem` rows (actions in `src/app/remediation/actions.ts`); Module 15 (`src/lib/report/`) is pure aggregation. See `HANDOFF.md` for the full module map.
 
 **Wizard**: 7-step form (`src/components/wizard/step{1-7}-*.tsx`) driven by `wizard-shell.tsx` using react-hook-form. Steps map to schema sections (Basic Info → Use Case → Technical → Data & People → Build/Vendor → Risk Flags → Review). `step7-review.tsx` is read-only summary before submit.
 
 **Completeness score**: Computed in `src/lib/completeness.ts` from `REQUIRED_FIELDS` (defined in `src/lib/schema.ts`). Stored as `completenessScore` integer on the model.
 
 **Routes**:
-- `/inventory` — list view with `InventoryTable` (TanStack Table)
-- `/inventory/new` — wizard (create)
-- `/inventory/[id]` — read-only detail
-- `/inventory/[id]/edit` — edit form (same schema as wizard)
+- `/inventory` — list view with `InventoryTable` (TanStack Table); `/inventory/new` (wizard), `/inventory/[id]`, `/inventory/[id]/edit`
+- Module routes (each `/<slug>` list + `/<slug>/systems/[id]` detail): `/entity-type`, `/ai-system-definition`, `/eu-scope`, `/exclusions`, `/prohibited`, `/high-risk`, `/reclassification`, `/gpai`, `/ai-literacy`, `/transparency`, `/obligations`, `/readiness`, `/remediation`
+- `/report`, `/report/systems/[id]`, `/report/non-final-guidance` — Module 15 (print-based PDF export)
+- Nav groups are defined in `src/lib/nav.ts`
 
 **UI components**: `src/components/ui/` are shadcn/ui primitives (Base UI-backed). Don't replace them with raw HTML. `src/lib/options.ts` holds all enum constants shared between schema and UI.
 

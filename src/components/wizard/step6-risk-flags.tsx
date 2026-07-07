@@ -13,6 +13,7 @@ export function Step6RiskFlags() {
         name="riskDomainFlags"
         label="Risk-domain areas"
         options={RISK_DOMAIN_FLAGS}
+        tooltip="These flags seed the Annex III high-risk screening (recruitment, credit, education, essential services, biometrics, law enforcement...) and the prohibited-practice screening (emotion recognition). Select everything that genuinely applies — an empty or 'Not sure' answer lowers every downstream assessment's confidence."
       />
     </div>
   );

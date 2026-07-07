@@ -11,7 +11,7 @@
     "prebuild": "npm run prisma:generate",
     "start": "next start",
     "lint": "eslint .",
-    "test": "tsx src/lib/ai-system.test.ts",
+    "test": "tsx src/lib/ai-system.test.ts && tsx src/lib/entity-type/roleRules.test.ts && tsx src/lib/ai-system-definition/definitionRules.test.ts && tsx src/lib/eu-scope/scopeRules.test.ts && tsx src/lib/exclusions/exclusionRules.test.ts && tsx src/lib/prohibited/rules.test.ts && tsx src/lib/high-risk/rules.test.ts && tsx src/lib/ai-literacy/literacyRules.test.ts && tsx src/lib/reclassification/reclassificationRules.test.ts && tsx src/lib/gpai/rules.test.ts && tsx src/lib/transparency/rules.test.ts && tsx src/lib/obligations/obligationRules.test.ts && tsx src/lib/evidence/evidenceRules.test.ts && tsx src/lib/remediation/remediationRules.test.ts && tsx src/lib/report/reportRules.test.ts",
     "db:seed": "tsx prisma/seed.ts",
     "db:repair": "tsx prisma/repair.ts",
     "db:reset": "prisma migrate reset --force && npm run db:seed",
