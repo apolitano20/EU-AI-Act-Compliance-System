@@ -1,0 +1,155 @@
+# Field framework shared by modules 4-15.
+# Mirrors the pattern already established in Module 2 (entity-type) and
+# Module 3 (ai-system-definition): plain-English questionnaire, deterministic
+# rules file, confidence-scored result object, summary cards + table + detail
+# page, disclaimer footer. Extended with fields surfaced by web research into
+# post-2024 EU AI Act developments (Digital Omnibus, draft high-risk guidelines).
+
+field_categories:
+
+  - category: Questionnaire
+    detail_level: detailed
+    description: >
+      Plain-English, factual-only questions (never "are you high-risk?" style).
+      Reuse Module 1/2/3 data first; ask only what's missing for this module.
+    fields:
+      - name: question_text
+        description: Plain-English question, no legal jargon.
+        detail_level: detailed
+      - name: helper_text
+        description: >
+          Optional tooltip/expansion for ambiguous terms (e.g. "profiling",
+          "substantial modification") — same pattern as Module 2's `question.helper`.
+        detail_level: moderate
+      - name: answer_options
+        description: Yes / No / Not sure / Not applicable, or module-specific multi-select.
+        detail_level: brief
+      - name: reused_from
+        description: Which existing module/field this answer is seeded from, if any.
+        detail_level: brief
+
+  - category: Deterministic Rules
+    detail_level: detailed
+    description: >
+      Rules file per module (e.g. src/lib/<module>/rules.ts), no LLM reasoning,
+      transparent and rule-traceable — matches roleRules.ts / definitionRules.ts.
+    fields:
+      - name: legal_basis_citation
+        description: >
+          Article/Annex/Recital reference per rule. New field (research finding) —
+          supports rule-traceability and lets Module 15's report cite sources.
+        detail_level: detailed
+      - name: applicable_from_date
+        description: >
+          Per-obligation enforcement date. New field (research finding) — required
+          because the Digital Omnibus (2026-05) split the timeline: prohibited
+          practices unchanged (2025-02-02), GPAI unchanged (2025-08-02), transparency
+          unchanged (2026-08-02), Annex III high-risk deferred to 2027-12-02, Annex I
+          high-risk deferred to 2028-08-02. Without this, obligations can show as due
+          when they aren't yet, or vice versa.
+        detail_level: detailed
+      - name: guidance_status
+        description: >
+          "final" | "draft" | "provisional". New field (research finding, confirmed
+          with user) — the May 2026 Digital Omnibus and May 2026 draft high-risk
+          classification guidelines are not yet adopted; any rule derived from them
+          must carry this flag.
+        detail_level: detailed
+      - name: source_version_date
+        description: Date the underlying guidance/law text was last checked, paired with guidance_status.
+        detail_level: moderate
+
+  - category: Result Object
+    detail_level: detailed
+    description: Per-system, per-module assessment output.
+    fields:
+      - name: classification_or_status
+        description: >
+          Status label using "likely/possible/needs review" wording — never
+          "compliant" or "legally confirmed" (established constraint).
+        detail_level: detailed
+      - name: confidence_score
+        description: 0-100 deterministic score, per module-2/3 scoring pattern.
+        detail_level: detailed
+      - name: confidence_label
+        description: high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19).
+        detail_level: brief
+      - name: reasoning_summary
+        description: Deterministic generated text explaining the classification.
+        detail_level: moderate
+      - name: positive_indicators / negative_indicators
+        description: Evidence lists supporting/against the classification.
+        detail_level: moderate
+      - name: key_uncertainties
+        description: Unknown/missing/contradictory data driving lower confidence.
+        detail_level: moderate
+      - name: missing_fields
+        description: Which required upstream fields are absent.
+        detail_level: brief
+      - name: recommended_next_questions
+        description: Targeted follow-up questions, shown only when needed.
+        detail_level: moderate
+      - name: role_conditional_obligation
+        description: >
+          New field (research finding) — same system yields different duties by
+          entity role (provider/deployer/importer/distributor/authorised rep).
+          Store the obligation set keyed to Module 2's role output; re-evaluate if
+          a Module 9 reclassification trigger fires.
+        detail_level: detailed
+      - name: reclassification_trigger_flags
+        description: >
+          New field (research finding) — boolean set (substantial_modification,
+          rebranded, purpose_changed_to_high_risk) feeding Module 9, can promote a
+          deployer/distributor to provider status and swap the obligation set.
+        detail_level: detailed
+      - name: registration_required
+        description: >
+          New field (research finding) — Article 49/Annex VIII flag (+ non-public
+          variant for law-enforcement/migration/border systems), drives an
+          Obligations Matrix action item.
+        detail_level: moderate
+      - name: standards_conformity_route
+        description: >
+          New field (research finding) — for high-risk systems, whether the
+          presumption-of-conformity route via harmonised standards applies vs.
+          notified-body assessment. Feeds conformity-assessment obligation and
+          remediation timeline realism.
+        detail_level: moderate
+      - name: not_high_risk_documentation_flag
+        description: >
+          New field (research finding) — Article 6(3) carve-out still requires the
+          provider to document the "no significant risk" self-assessment and
+          register it. Prevents the tool from treating "not high-risk" as "nothing
+          to do."
+        detail_level: moderate
+
+  - category: UI Pattern
+    detail_level: brief
+    description: Repeats across modules 4-15.
+    fields:
+      - name: summary_cards
+      - name: results_table
+        description: Includes status / confidence / key-uncertainty columns at minimum.
+      - name: filters
+      - name: csv_export
+      - name: detail_page
+      - name: disclaimer_footer
+        description: >
+          "This assessment is a readiness-support tool based on deterministic
+          screening rules. It does not provide legal advice..." (established text,
+          reuse verbatim from Module 2/3).
+      - name: cross_module_consistency_warning
+        description: >
+          Flag when an earlier module's uncertain/needs-review status may
+          undermine a later module's classification (established pattern from
+          Module 3's warning about Module 2 reliance).
+
+uncertain:
+  - GPAI systemic-risk designation criteria beyond the 10^25 FLOP threshold
+    (Commission can also designate on capability/user-base/autonomy grounds) —
+    represent as an uncertainty/flag, not a hard rule.
+  - Whether AI Literacy (Article 4) remains a firm organisational obligation or
+    is softened to a Member-State/Commission promotion duty — depends on final
+    Digital Omnibus text (provisional agreement 2026-05-07, not yet finalized).
+  - Exact high-risk classification boundaries pending finalization of the
+    2026-05-19 draft Commission guidelines (consultation closed 2026-06-23).

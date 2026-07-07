@@ -1,0 +1,152 @@
+{
+  "module_id": "module-15",
+  "module_name": "Final Report Generator",
+  "flowchart_section": null,
+  "flowchart_section_note": "Practical add-on, not in the Future of Life Institute flowchart.",
+  "legal_basis": [
+    "Article 2 (scope)", "Article 4 (AI literacy)", "Article 5 (prohibited practices)",
+    "Article 6, Annex I, Annex III (high-risk classification)", "Article 9-15 (high-risk requirements)",
+    "Article 17 (QMS)", "Article 22-25 (authorised rep, value-chain/provider conversion)",
+    "Article 26-27 (deployer obligations, FRIA)", "Article 43, 47-49 (conformity, registration)",
+    "Article 50 (transparency)", "Article 51, 53, 55 (GPAI, systemic risk)",
+    "Article 72-73 (post-market monitoring, incident reporting)",
+    "Annex IV (technical documentation)", "Annex VIII (registration)",
+    "Recital 47, Recital 166"
+  ],
+  "depends_on": ["module-1", "module-2", "module-3", "module-4", "module-5", "module-6", "module-7", "module-8", "module-9", "module-10", "module-11", "module-12", "module-13", "module-14"],
+  "description": "Aggregates every module's output across every inventoried system into a single exportable compliance-readiness report. It performs no new classification of its own — it reads the result objects of Modules 1-14, cites the legal_basis_citation per obligation, and rolls the per-system statuses, readiness scores and remediation progress into an organisation-level summary. Its distinctive job is provenance and honesty: every obligation in the report shows the article/annex it rests on, its applicable_from_date, and — the flagged requirement of this module — whether the rule derives from final law or from draft/provisional guidance (the May 2026 Digital Omnibus and the 2026-05-19 draft high-risk classification guidelines). Anything resting on non-final text is badged so the report never presents a provisional deadline or an in-flux obligation as settled law.",
+
+  "Questionnaire": {
+    "description": "The report generator asks almost nothing of its own — it consumes upstream answers. The only questions are report-scoping choices about what to include and how conservatively to present in-flux rules.",
+    "fields": [
+      {
+        "question_text": "Which systems should the report cover?",
+        "helper_text": "Default is all inventoried systems (Module 1). You can scope to a subset (e.g. only high-risk, only a business unit) for a targeted board or auditor report.",
+        "answer_options": ["All systems", "High-risk only", "By business unit", "By role (provider/deployer)", "Custom selection"],
+        "reused_from": "module-1 inventory"
+      },
+      {
+        "question_text": "How should obligations resting on draft or provisional guidance be presented?",
+        "helper_text": "Conservative: include them and badge them as 'timeline/obligation not yet final'. Excluded: omit non-final rules entirely (risk: under-stating future duties). The default is conservative — include and badge, never silently drop.",
+        "answer_options": ["Include and badge (recommended)", "Include without badge", "Exclude non-final rules", "Not sure"],
+        "reused_from": "module-12/13/14 guidance_status per obligation"
+      },
+      {
+        "question_text": "Who is the audience for this report?",
+        "helper_text": "Adjusts tone and detail: internal (full detail, all uncertainties), board/executive (summary + risk view), external auditor/regulator (evidence citations and legal basis emphasised). Does not change the underlying data.",
+        "answer_options": ["Internal compliance", "Board / executive", "External auditor / regulator", "Not sure"],
+        "reused_from": "new — report scoping"
+      },
+      {
+        "question_text": "Include the full remediation plan or a progress summary only?",
+        "helper_text": "Full: every remediation item with owner and due date (Module 14). Summary: progress percentages and overdue counts only. Board reports usually want the summary; auditors usually want the full plan.",
+        "answer_options": ["Full remediation plan", "Progress summary only", "Not sure"],
+        "reused_from": "module-14 remediation items"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "description": "Rules file (src/lib/report/reportRules.ts). Pure aggregation — no LLM reasoning and no new classification. For each system it reads the result objects of Modules 1-14, joins them on system_id, and emits report sections. Each obligation line carries through its legal_basis_citation, applicable_from_date and guidance_status verbatim from the source module. A deterministic rule flags any line whose guidance_status is 'draft' or 'provisional' and surfaces it in a dedicated 'rests on non-final guidance' section. The report also runs cross-module consistency checks (e.g. an uncertain Module 2 role that undermines a Module 12 obligation) and lists them rather than hiding them.",
+    "aggregation_logic": "For each system: pull status from Modules 3-11, the consolidated obligation set from Module 12, readiness state from Module 13, and remediation progress from Module 14. Roll up to organisation level: counts by risk tier, average readiness score, total open/overdue remediation items, and a count of obligations resting on non-final guidance.",
+    "non_final_flagging_logic": "any obligation line with guidance_status ∈ {draft, provisional} is badged and collected into a 'Obligations resting on draft/provisional guidance' appendix, with its source (Digital Omnibus 2026-05 provisional agreement, or draft high-risk guidelines 2026-05-19) named. A report is never allowed to present a provisional deadline or in-flux obligation as final.",
+    "legal_basis_citation": "Carried through verbatim per obligation from the source module (Module 12 is the canonical source; e.g. Article 9 for risk management, Article 50 for transparency, Article 5 for prohibited practices). The report cites, it does not invent, legal basis.",
+    "applicable_from_date": "Carried through per obligation. The report shows the split timeline explicitly: prohibited practices 2025-02-02 (final), AI literacy 2025-02-02 (final, possibly softened), GPAI 2025-08-02 (final), transparency 2026-08-02 (final), Annex III high-risk 2027-12-02 (provisional — Digital Omnibus deferral), Annex I high-risk 2028-08-02 (provisional).",
+    "guidance_status": "Carried through per obligation (final / provisional / draft) and used to drive the non-final-guidance flagging. This is the module's headline field.",
+    "source_version_date": "2026-07-07",
+    "report_sections": [
+      {"section": "Executive summary", "content": "organisation-level readiness snapshot, counts by risk tier, headline risks, count of obligations on non-final guidance"},
+      {"section": "Per-system pages", "content": "for each system: role (M2), definition gate (M3), scope/exclusions (M4-5), prohibited (M6), high-risk (M7), literacy (M8), reclassification (M9), GPAI (M10), transparency/FRIA (M11), obligations matrix (M12), readiness (M13), remediation (M14)"},
+      {"section": "Obligations register", "content": "every applicable obligation across all systems with legal_basis_citation, applicable_from_date, guidance_status, readiness and remediation status"},
+      {"section": "Draft/provisional-guidance appendix", "content": "every obligation whose rule rests on the Digital Omnibus (2026-05) or draft high-risk guidelines (2026-05-19), badged and sourced"},
+      {"section": "Cross-module consistency warnings", "content": "uncertain upstream statuses that may undermine downstream classifications"},
+      {"section": "Assumptions & disclaimers", "content": "date checked, guidance versions, the standard non-legal-advice disclaimer"}
+    ]
+  },
+
+  "Result Object": {
+    "description": "Organisation-level compliance-readiness report object plus per-system report pages. Aggregation only — it inherits all classifications and never re-derives them.",
+    "classification_or_status": "Organisation-level readiness status using 'likely/possible/needs review' wording, e.g. 'N systems assessed: A likely high-risk, B possible high-risk needs review, C not high-risk, D prohibited-practice flags'. Per-obligation lines carry the source module's status label. Never 'compliant' or 'legally confirmed' — the report is a readiness snapshot, not an attestation.",
+    "confidence_score": "0-100 deterministic, measuring confidence in the aggregated picture (not in compliance). Computed as a coverage-weighted roll-up: the minimum/weighted-average of upstream module confidences per system, minus penalties for systems with 'needs review' statuses or missing upstream modules. A report over an inventory with many uncertain upstream statuses scores lower.",
+    "confidence_label": "high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic text, e.g. 'This report covers 8 systems. 3 are likely high-risk with an average readiness of 42%; 12 obligations across the portfolio rest on draft/provisional guidance (the deferred high-risk deadlines and the draft classification guidelines) and are badged accordingly. 5 remediation items are overdue against provisional deadlines. Aggregate confidence is medium because 2 systems have an uncertain Module 2 role that undermines their obligation sets.'",
+    "positive_indicators": [
+      "Every obligation line cites its legal_basis_citation and applicable_from_date",
+      "Obligations resting on draft/provisional guidance are badged and collected in a dedicated appendix, never presented as settled",
+      "Cross-module consistency warnings are surfaced, not hidden",
+      "Per-system readiness (M13) and remediation progress (M14) are traceable back to the underlying articles"
+    ],
+    "negative_indicators": [
+      "Systems in the inventory missing one or more upstream modules (report incomplete for them)",
+      "Provisional deadlines presented without the non-final badge",
+      "Upstream 'needs review' statuses rolled into a confident-looking headline",
+      "Remediation progress reported as compliance"
+    ],
+    "key_uncertainties": [
+      "The split enforcement timeline itself is provisional — the Digital Omnibus (provisional agreement 2026-05-07) is not yet adopted, so the deferred high-risk dates (2027-12-02 / 2028-08-02) could change.",
+      "The high-risk classification of some systems rests on draft Commission guidelines (2026-05-19, consultation closed 2026-06-23) not yet final.",
+      "Whether AI literacy (Article 4) remains a firm obligation or is softened by the final Omnibus text.",
+      "GPAI systemic-risk designations beyond the 10^25 FLOP threshold (capability/user-base/autonomy grounds) are Commission-discretionary and cannot be firmly reported."
+    ],
+    "missing_fields": [
+      "One or more upstream module result objects for a system in the inventory",
+      "module-14 remediation state (for the remediation section)",
+      "module-13 readiness scores (for the readiness roll-up)",
+      "guidance_status on any obligation line (needed to run the non-final flagging)"
+    ],
+    "recommended_next_questions": [
+      "For systems missing upstream modules, should they be excluded from the report or run first?",
+      "Should the report be regenerated once the Digital Omnibus is finalised, given how many lines rest on provisional dates?",
+      "Which audience version (internal / board / auditor) is being produced, so detail and badging are set appropriately?",
+      "Should systems with 'needs review' upstream statuses be excluded from the headline readiness figure?"
+    ],
+    "role_conditional_obligation": {
+      "description": "Reported, not recomputed. The report shows, per system, the obligation set for the role(s) it holds (from Module 2/12); a provider page lists far more obligations than a distributor page. Where a system holds multiple roles, both obligation sets are shown.",
+      "note": "If a Module 9 reclassification changed the role, the report reflects the reclassified (provider) obligation set and notes the trigger."
+    },
+    "reclassification_trigger_flags": {
+      "description": "Reported per system from Module 9/12. When set, the report annotates the system as reclassified-to-provider and shows the expanded obligation set, with the trigger named.",
+      "substantial_modification": "[uncertain]",
+      "rebranded": "[uncertain]",
+      "purpose_changed_to_high_risk": "[uncertain]"
+    },
+    "registration_required": {
+      "description": "Reported per system from Module 12; the report lists registration status (done/outstanding) as part of the obligations register and flags the non-public variant where relevant.",
+      "report_line": "EU database registration (Annex VIII) status per system; Article 6(3) not-high-risk assessment registration where a derogation is claimed",
+      "non_public_variant_law_enforcement_migration_border": "[uncertain]"
+    },
+    "standards_conformity_route": {
+      "description": "Reported per high-risk system from Module 12/13; the report shows whether conformity rests on harmonised standards (presumption of conformity) or a notified body, because it materially affects the realism of the remediation timeline shown.",
+      "route": "harmonised_standards (Annex VI) | notified_body (Annex VII) [uncertain]",
+      "note": "Where harmonised standards are not yet published, the report flags the conformity line as schedule-risk."
+    },
+    "not_high_risk_documentation_flag": {
+      "description": "Reported per system from Module 12/13; when set, the report shows the Article 6(3) self-assessment + registration as an outstanding obligation, so a 'not high-risk' system is not reported as having nothing to do.",
+      "value": "carried through from Module 12/13 OBL-ART6-3-NOTHR-DOC per system"
+    }
+  },
+
+  "UI Pattern": {
+    "summary_cards": [
+      "Systems covered", "Likely high-risk", "Prohibited-practice flags", "GPAI models",
+      "Average readiness %", "Open/overdue remediation items", "Obligations on non-final guidance", "Overall report confidence"
+    ],
+    "results_table": {
+      "description": "Portfolio obligations register — one row per system x obligation, aggregated across all modules.",
+      "columns": ["System name", "Risk tier", "Role", "Obligation", "Legal basis", "Applicable from", "Guidance status", "Readiness", "Remediation status", "Owner", "Due date", "Confidence", "Key uncertainty"]
+    },
+    "filters": ["System", "Risk tier", "Role", "Obligation", "Guidance status (final/provisional/draft)", "Readiness status", "Remediation status", "Applicable-from range", "Confidence"],
+    "csv_export": "Exports the full portfolio obligations register with legal_basis_citation, applicable_from_date, guidance_status, readiness and remediation state per system x obligation — the single canonical export of the whole assessment. Also supports PDF export of the formatted report (executive summary + per-system pages + non-final-guidance appendix).",
+    "detail_page": "Per-system report page assembling every module's output for that system, with a badged obligations register, the readiness score, the remediation board, and a legal-basis footnote per obligation. Plus an organisation-level dashboard page and a dedicated 'rests on non-final guidance' appendix page.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.",
+    "cross_module_consistency_warning": "Aggregates and displays every upstream consistency warning: flag when a system's downstream classification (e.g. Module 12 obligations) depends on an uncertain/needs-review upstream status (e.g. Module 2 role, Module 3 definition gate, Module 7 high-risk) — e.g. 'This system's obligation set rests on a Module 2 role still marked needs review; the reported obligations may change once the role is confirmed.'"
+  },
+
+  "uncertain": [
+    "applicable_from_date (deferred high-risk dates 2027-12-02 / 2028-08-02 are provisional pending Digital Omnibus adoption)",
+    "guidance_status (obligations derived from the Digital Omnibus and the 2026-05-19 draft high-risk guidelines are provisional/draft)",
+    "reclassification_trigger_flags (inherited per system from Module 9 via Module 12)",
+    "registration_required.non_public_variant_law_enforcement_migration_border",
+    "standards_conformity_route.route (affects reported conformity-timeline realism)"
+  ]
+}

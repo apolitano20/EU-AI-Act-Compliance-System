@@ -1,0 +1,250 @@
+{
+  "module_id": "module-6",
+  "module_name": "Prohibited AI Practices",
+  "flowchart_section": "#R3",
+  "legal_basis": ["Article 5", "Recital 28-45", "Article 99"],
+  "depends_on": ["module-1", "module-5"],
+  "description": "Screens each inventoried AI system against the eight Article 5 prohibitions (subliminal/manipulative techniques, exploitation of vulnerabilities, social scoring, predictive policing by profiling, untargeted facial-image scraping, workplace/education emotion recognition, sensitive-attribute biometric categorisation, real-time remote biometric identification), plus the new Digital Omnibus Article 5 prohibition on AI 'nudifiers' / non-consensual intimate imagery and CSAM generation.",
+  "source_version_date": "2026-07-07",
+  "guidance_status": "mixed",
+  "guidance_status_note": "Original eight prohibitions are final (in force since 2025-02-02, Commission guidelines on prohibited practices published 2025-02-04). The nudifier/NCII/CSAM prohibition is provisional (Digital Omnibus political agreement 2026-05-07, applies 2026-12-02, not yet the adopted final text).",
+
+  "Questionnaire": {
+    "category": "Questionnaire",
+    "detail_level": "detailed",
+    "description": "Plain-English, factual-only questions. Never asks 'is this prohibited?'. Reuses Module 1 (use case, output types, deployment context, biometrics flag) and Module 5 (exclusion status) before asking anything new.",
+    "questions": [
+      {
+        "id": "P1",
+        "question_text": "Does the system try to influence people's decisions or behaviour using techniques they cannot consciously perceive or that are designed to be deceptive or manipulative?",
+        "helper_text": "Examples: subliminal audio/visual cues below conscious perception, dark patterns engineered to distort choices. Ordinary persuasive advertising that people can recognise is NOT this.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.outputTypes, module-1.useCaseDescription"
+      },
+      {
+        "id": "P2",
+        "question_text": "Could the system materially distort the behaviour of a specific person or group in a way likely to cause them significant harm?",
+        "helper_text": "'Significant harm' includes physical, psychological, or financial harm. Paired with P1 to distinguish prohibited manipulation from lawful influence.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "P3",
+        "question_text": "Does the system target or take advantage of people because of their age, a disability, or a specific social or economic situation?",
+        "helper_text": "'Exploiting a vulnerability' means using a known weakness of a protected group to distort their behaviour in a harmful way (Article 5(1)(b)).",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.affectedPeople"
+      },
+      {
+        "id": "P4",
+        "question_text": "Does the system score or rate people over time based on their social behaviour or personal characteristics, in a way that can lead to unfavourable treatment in unrelated situations?",
+        "helper_text": "'Social scoring' (Article 5(1)(c)). Ordinary sector-specific credit scoring or fraud detection based on relevant data is treated separately (may be high-risk, not prohibited).",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.useCaseDescription"
+      },
+      {
+        "id": "P5",
+        "question_text": "Does the system predict the risk that an individual will commit a crime based solely on profiling or personality traits?",
+        "helper_text": "Article 5(1)(d). The prohibition does not cover systems that support human assessment based on objective, verifiable facts directly linked to a criminal activity.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.useCaseDescription, module-1.sector"
+      },
+      {
+        "id": "P6",
+        "question_text": "Does the system build or expand a facial-recognition database by scraping facial images from the internet or CCTV footage without targeting?",
+        "helper_text": "Article 5(1)(e) prohibits untargeted (mass) scraping of facial images to create or grow recognition databases.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.dataSources, module-1.biometricData"
+      },
+      {
+        "id": "P7",
+        "question_text": "Does the system infer people's emotions in a workplace or an education/training setting?",
+        "helper_text": "Article 5(1)(f). There is a carve-out for medical or safety reasons (e.g. detecting driver fatigue for safety).",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.deploymentContext, module-1.outputTypes"
+      },
+      {
+        "id": "P8",
+        "question_text": "Does the system sort people into categories using their biometric data to infer sensitive attributes such as race, political opinions, trade-union membership, religion, sex life, or sexual orientation?",
+        "helper_text": "Article 5(1)(g). Labelling or filtering of lawfully acquired biometric datasets in law enforcement is excepted.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.biometricData, module-1.outputTypes"
+      },
+      {
+        "id": "P9",
+        "question_text": "Is the system used for real-time remote biometric identification of people in publicly accessible spaces for law-enforcement purposes?",
+        "helper_text": "Article 5(1)(h). 'Real-time' and 'remote' are cumulative. Narrow exceptions exist (e.g. targeted search for victims, imminent threat, locating a suspect of a listed serious offence) subject to authorisation.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.biometricData, module-2.role, module-1.deploymentContext"
+      },
+      {
+        "id": "P10",
+        "question_text": "Can the system generate sexual or intimate images of real, identifiable people without their consent, or generate child sexual abuse material?",
+        "helper_text": "New Digital Omnibus prohibition (provisional, applies 2026-12-02). Covers 'nudifier' apps and CSAM generators. Applies where this is the intended purpose OR a reasonably foreseeable and reproducible output that the provider has not prevented with reasonable and adequate technical safeguards.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.outputTypes, module-1.useCaseDescription"
+      },
+      {
+        "id": "P11",
+        "question_text": "If such intimate/sexual or abusive imagery could theoretically be produced, has the provider put in place technical safeguards that reliably prevent it?",
+        "helper_text": "Shown only if P10 is Yes or Not sure. The provisional prohibition captures foreseeable-misuse cases where safeguards are absent or inadequate.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "category": "Deterministic Rules",
+    "detail_level": "detailed",
+    "description": "src/lib/prohibited/rules.ts — deterministic, rule-traceable, no LLM reasoning. Each rule maps a questionnaire pattern to a prohibition with an explicit legal citation. Runs only if Module 5 did not fully exclude the system; a full exclusion short-circuits to 'not_assessed_excluded'.",
+    "rules": [
+      {
+        "rule_id": "PR-A",
+        "prohibition": "Harmful subliminal, manipulative or deceptive techniques",
+        "trigger": "P1 = Yes AND P2 = Yes",
+        "legal_basis_citation": "Article 5(1)(a); Recital 29",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-B",
+        "prohibition": "Exploitation of vulnerabilities (age, disability, socio-economic situation)",
+        "trigger": "P3 = Yes AND (P2 = Yes OR significant-harm likely)",
+        "legal_basis_citation": "Article 5(1)(b); Recital 29",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-C",
+        "prohibition": "Social scoring leading to detrimental/unfavourable treatment",
+        "trigger": "P4 = Yes",
+        "legal_basis_citation": "Article 5(1)(c); Recital 31",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-D",
+        "prohibition": "Predictive policing based solely on profiling/personality",
+        "trigger": "P5 = Yes",
+        "legal_basis_citation": "Article 5(1)(d); Recital 42",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-E",
+        "prohibition": "Untargeted scraping of facial images to build/expand recognition databases",
+        "trigger": "P6 = Yes",
+        "legal_basis_citation": "Article 5(1)(e); Recital 43",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-F",
+        "prohibition": "Emotion recognition in workplace and education (no medical/safety exception)",
+        "trigger": "P7 = Yes AND NOT medical_or_safety_exception",
+        "legal_basis_citation": "Article 5(1)(f); Recital 44",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-G",
+        "prohibition": "Biometric categorisation inferring sensitive attributes",
+        "trigger": "P8 = Yes AND NOT law-enforcement labelling exception",
+        "legal_basis_citation": "Article 5(1)(g); Recital 30",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-H",
+        "prohibition": "Real-time remote biometric identification in public spaces for law enforcement",
+        "trigger": "P9 = Yes AND NOT authorised_exception (Article 5(1)(h)(i)-(iii))",
+        "legal_basis_citation": "Article 5(1)(h), Article 5(2)-(7); Recital 32-38",
+        "applicable_from_date": "2025-02-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "PR-I",
+        "prohibition": "AI generation of non-consensual intimate imagery ('nudifiers') and CSAM",
+        "trigger": "P10 = Yes AND (intended_purpose OR (foreseeable_reproducible_output AND P11 != Yes))",
+        "legal_basis_citation": "Article 5 (new point, Digital Omnibus 2026-05-07); Article 99 penalties",
+        "applicable_from_date": "2026-12-02 [uncertain]",
+        "guidance_status": "provisional [uncertain]",
+        "source_version_date": "2026-07-07"
+      }
+    ]
+  },
+
+  "Result Object": {
+    "category": "Result Object",
+    "detail_level": "detailed",
+    "description": "Per-system prohibited-practice screening output.",
+    "classification_or_status": "One of: likely_prohibited | possibly_prohibited | needs_review | likely_not_prohibited | not_assessed_excluded. Never 'compliant'/'illegal' — the tool flags likelihood for legal review.",
+    "confidence_score": "0-100 deterministic. Start at 100; subtract 15 per core 'Not sure', 20 if biometrics status unknown but relevant, 25 if deployment context (workplace/education/law-enforcement/public-space) unknown but a biometric or emotion trigger is partially met, 10 for each contradictory answer; floor at 0.",
+    "confidence_label": "high (80-100) | medium (50-79) | low (20-49) | insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic text, e.g. 'This system infers emotions and is deployed in a workplace with no stated medical or safety purpose, matching the Article 5(1)(f) prohibition. It should be reviewed by qualified counsel before deployment.'",
+    "positive_indicators": [
+      "Matched trigger pattern for one or more Article 5 prohibitions",
+      "Deployment context confirms a prohibited setting (e.g. workplace, publicly accessible space)",
+      "Biometric/emotion/sensitive-attribute output type confirmed in Module 1"
+    ],
+    "negative_indicators": [
+      "A statutory exception applies (medical/safety, authorised law-enforcement use, lawful dataset labelling)",
+      "System already fully excluded by Module 5 (military/national-security, R&D, personal use)",
+      "Output type and use case do not touch any Article 5 category"
+    ],
+    "key_uncertainties": [
+      "Whether a claimed medical/safety exception to emotion recognition genuinely applies",
+      "Whether real-time remote biometric ID falls within an authorised Article 5(1)(h) exception",
+      "Scope of the provisional nudifier/CSAM prohibition and the 'reasonable and adequate safeguards' standard pending final Digital Omnibus text",
+      "Whether foreseeable-misuse generation of intimate imagery is 'reproducible without significant modification'"
+    ],
+    "missing_fields": [
+      "module-1.biometricData",
+      "module-1.deploymentContext",
+      "module-1.outputTypes",
+      "module-5.exclusionStatus"
+    ],
+    "recommended_next_questions": [
+      "Is the emotion-recognition use justified strictly by a medical or safety purpose?",
+      "Is the biometric identification real-time or post-event, and is there a documented legal authorisation?",
+      "What technical safeguards prevent generation of intimate imagery of real identifiable people?"
+    ],
+    "role_conditional_obligation": "Prohibitions in Article 5 bind ALL operators (providers, deployers, importers, distributors) regardless of role — there is no role that makes a prohibited practice permissible. Role only affects who bears the penalty exposure. Store as: { provider: 'must not place on market/put into service', deployer: 'must not use', importer_distributor: 'must not make available' }.",
+    "reclassification_trigger_flags": {
+      "substantial_modification": "If a downstream actor modifies a non-prohibited system so it now performs a prohibited function, they become responsible for the prohibited practice (feeds Module 9).",
+      "rebranded": false,
+      "purpose_changed_to_high_risk": "Not applicable to prohibitions directly, but a purpose change into a prohibited use must re-trigger this module.",
+      "purpose_changed_to_prohibited": "New flag [uncertain] — re-run Module 6 if Module 1 intended-purpose changes."
+    },
+    "registration_required": "Not applicable — prohibited systems cannot be placed on the market at all, so there is no Annex VIII / Article 49 registration path. A prohibited-practice finding overrides any high-risk registration workflow.",
+    "standards_conformity_route": "Not applicable — prohibited practices have no conformity-assessment route; the outcome is prohibition, not certification.",
+    "not_high_risk_documentation_flag": "Not applicable to prohibited practices. If a system is likely_not_prohibited it proceeds to Module 7 (high-risk classification), where the Article 6(3) not-high-risk documentation duty may apply."
+  },
+
+  "UI Pattern": {
+    "category": "UI Pattern",
+    "detail_level": "brief",
+    "summary_cards": ["Total systems screened", "Likely prohibited", "Possibly prohibited", "Needs review", "Likely not prohibited", "Excluded (from Module 5)"],
+    "results_table": "One row per system with columns: System name, Matched prohibition(s), Status, Confidence, Key uncertainty, Applicable-from date, Last assessed, Actions. Status and confidence columns mandatory.",
+    "filters": ["Status", "Confidence", "Matched prohibition", "Sector", "Deployment context"],
+    "csv_export": "Exports all table columns plus legal_basis_citation and guidance_status per matched prohibition.",
+    "detail_page": "/prohibited/systems/[id] — system overview from inventory, questionnaire, live result panel with reasoning_summary, positive/negative indicators, key uncertainties, recommended next questions, and per-prohibition legal citations.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice. Results should be reviewed by qualified legal or compliance professionals before regulatory decisions are made.",
+    "cross_module_consistency_warning": "If Module 5 returned an uncertain/needs-review exclusion status, warn that a prohibited-practice finding may be moot (or vice versa) until the exclusion is confirmed. If Module 1's biometricData or deploymentContext is missing, warn that biometric-related prohibitions cannot be reliably screened."
+  },
+
+  "uncertain": [
+    "applicable_from_date",
+    "guidance_status",
+    "reclassification_trigger_flags"
+  ]
+}

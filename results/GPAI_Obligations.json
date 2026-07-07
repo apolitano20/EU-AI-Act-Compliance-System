@@ -1,0 +1,258 @@
+{
+  "module": "GPAI Obligations",
+  "flowchart_section": "#R1",
+  "legal_basis": ["Article 51", "Article 53", "Article 55", "Article 25", "Annex XI", "Annex XII", "Annex XIII", "Recital 97", "Recital 110"],
+  "depends_on": ["module-1"],
+  "description": "General-purpose AI model (GPAI) obligations and systemic-risk designation. Covers three angles: (1) the organisation is itself a provider of a GPAI model (Article 53, and Article 55 if systemic-risk); (2) the reciprocal downstream question set — the organisation builds on a third-party GPAI model and relies on Article 25/53 information-flow obligations; (3) a GPAI model is integrated into a high-risk AI system. Systemic-risk is NOT purely the 10^25 FLOP presumption — the Commission can also designate on capability/user-base/scalability/autonomy criteria (Article 51(1)(b), Annex XIII), so it is surfaced as an uncertainty rather than a hard rule.",
+
+  "Questionnaire": {
+    "description": "Plain-English, factual-only questions. Reuse Module 1 inventory data first (usesGpaiOrLlm, underlyingModelOrTool, modelProvider, buildType, fineTunedOrRetrainedModel); ask only what is missing.",
+    "questions": [
+      {
+        "id": "gpai_q1",
+        "question_text": "Does your organisation develop, train, or place on the market a general-purpose AI model (a broadly capable model such as a large language model, foundation model, or multimodal model)?",
+        "helper_text": "A general-purpose AI model displays significant generality and can competently perform a wide range of distinct tasks, and can be integrated into many downstream systems. This is the model itself, not a narrow single-purpose tool.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: usesGpaiOrLlm, underlyingModelOrTool, buildType (built internally)"
+      },
+      {
+        "id": "gpai_q2",
+        "question_text": "Was this general-purpose AI model trained using a very large amount of computing power?",
+        "helper_text": "A model is presumed to carry systemic risk when the cumulative training compute is greater than 10^25 floating-point operations (FLOP). If you do not know the training compute, answer 'Not sure' — the model provider or vendor documentation may state it.",
+        "answer_options": ["Yes, above 10^25 FLOP", "No, below 10^25 FLOP", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "gpai_q3",
+        "question_text": "Has the European Commission (or the AI Office) designated your model as a general-purpose AI model with systemic risk, or notified you that it may be?",
+        "helper_text": "Beyond the compute threshold, the Commission can designate a model on other grounds — evaluated capabilities, number of registered/business users, market reach, scalability, or access to tools/autonomy (Article 51(1)(b), Annex XIII). This is not a fixed number, so it is treated as an open question.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "gpai_q4",
+        "question_text": "Is your general-purpose AI model released under a free and open-source licence, with its parameters, architecture, and usage information made publicly available?",
+        "helper_text": "Open-source GPAI models get a partial exemption from some Article 53 documentation duties, BUT this exemption does NOT apply if the model has systemic risk. The copyright policy and the training-content summary duties still apply.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "gpai_q5",
+        "question_text": "Does this AI system build on, call, or fine-tune a general-purpose AI model provided by another company (for example an external LLM API or a downloaded foundation model)?",
+        "helper_text": "This is the downstream / reciprocal case. If yes, you are a downstream provider or deployer and rely on the upstream model provider giving you the information listed in Annex XII so you can meet your own obligations.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: usesGpaiOrLlm = yes, modelProvider (external), buildType"
+      },
+      {
+        "id": "gpai_q6",
+        "question_text": "Have you fine-tuned, retrained, or substantially modified a third-party general-purpose AI model?",
+        "helper_text": "Substantial modification or fine-tuning of a GPAI model can make YOU a provider of the modified model, triggering Article 53 obligations for the change you made (and Article 55 if your training compute crosses the systemic-risk threshold). Links to Module 9 reclassification.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: fineTunedOrRetrainedModel; Module 2: Article 25 provider-conversion risk"
+      },
+      {
+        "id": "gpai_q7",
+        "question_text": "Is a general-purpose AI model integrated into a system that could be high-risk (for example used in recruitment, credit, biometrics, or critical infrastructure)?",
+        "helper_text": "When a GPAI model is integrated into a high-risk AI system, the downstream provider needs sufficient information and cooperation from the model provider to comply with the high-risk obligations. Full high-risk classification is handled in a later module; here we only flag the dependency.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: riskDomainFlags, affectsDecisionsAboutPeople"
+      },
+      {
+        "id": "gpai_q8",
+        "question_text": "If you provide a general-purpose AI model, have you put in place a policy to comply with EU copyright law and prepared a sufficiently detailed public summary of the content used to train the model?",
+        "helper_text": "These two duties (Article 53(1)(c) copyright policy and Article 53(1)(d) training-content summary using the AI Office template) apply to ALL GPAI providers, including open-source ones.",
+        "answer_options": ["Yes", "No", "Partly", "Not sure", "Not applicable"],
+        "reused_from": null
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "description": "Rules file src/lib/gpai/rules.ts — deterministic, no LLM reasoning, rule-traceable. Each rule carries its legal basis, per-obligation enforcement date, guidance status, and the date the source text was last checked.",
+    "rules": [
+      {
+        "id": "GPAI-R1",
+        "name": "Provider of a GPAI model",
+        "condition": "gpai_q1 = Yes (organisation develops/places a GPAI model on the market)",
+        "outcome": "Flag Article 53 GPAI-provider obligations: technical documentation (Annex XI), information for downstream providers (Annex XII), EU copyright policy, and public training-content summary.",
+        "legal_basis_citation": "Article 53; Annex XI; Annex XII; Recital 97",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R2",
+        "name": "Systemic-risk presumption (compute)",
+        "condition": "gpai_q2 = Yes (training compute > 10^25 FLOP)",
+        "outcome": "Presumed GPAI model with systemic risk. Add Article 55 obligations on top of Article 53. Provider must notify the Commission within 2 weeks of meeting/expecting to meet the threshold (Article 52).",
+        "legal_basis_citation": "Article 51(1)(a), 51(2); Article 52; Article 55",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R3",
+        "name": "Systemic-risk designation (qualitative)",
+        "condition": "gpai_q3 = Yes OR (model is among the most advanced / very high reach) — Commission designation on capability, user-base, scalability, or autonomy grounds",
+        "outcome": "Possible GPAI model with systemic risk even below the FLOP threshold. Surface as UNCERTAINTY, not a hard rule — designation is a Commission decision using Annex XIII criteria, not a fixed number. Recommend monitoring and legal review.",
+        "legal_basis_citation": "Article 51(1)(b); Annex XIII; Recital 110",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R4",
+        "name": "Article 55 systemic-risk obligations",
+        "condition": "GPAI-R2 OR GPAI-R3 triggers",
+        "outcome": "Flag: state-of-the-art model evaluation and adversarial testing (red-teaming), systemic-risk assessment and mitigation, serious-incident tracking and reporting to the AI Office, and adequate cybersecurity protection for the model and physical infrastructure.",
+        "legal_basis_citation": "Article 55(1)(a)-(d)",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R5",
+        "name": "Open-source partial exemption",
+        "condition": "gpai_q4 = Yes AND NOT (GPAI-R2 OR GPAI-R3)",
+        "outcome": "Exempt from Annex XI technical documentation and Annex XII downstream-information duties, but the copyright policy and training-content summary still apply. Exemption is VOID if the model has systemic risk.",
+        "legal_basis_citation": "Article 53(2); Article 53(1)(c)-(d); Recital 104",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R6",
+        "name": "Downstream provider — information-flow reliance",
+        "condition": "gpai_q5 = Yes (builds on a third-party GPAI model)",
+        "outcome": "Organisation is a downstream provider/deployer. Flag right to receive Annex XII information and cooperation from the upstream GPAI model provider; capture whether that information was actually received. Feeds the Obligations Matrix as a supply-chain evidence item.",
+        "legal_basis_citation": "Article 53(1)(b); Annex XII; Article 25(4)",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R7",
+        "name": "Fine-tuning / substantial modification converts to provider",
+        "condition": "gpai_q6 = Yes (fine-tuned/retrained/substantially modified a third-party GPAI model)",
+        "outcome": "Organisation may become provider of the modified GPAI model for the modification, inheriting Article 53 duties (scoped to the change) and Article 55 if the modification training compute crosses the threshold. Set reclassification_trigger flag for Module 9.",
+        "legal_basis_citation": "Article 25(1); Recital 109; Article 53",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R8",
+        "name": "GPAI integrated into a high-risk system",
+        "condition": "gpai_q7 = Yes (GPAI model integrated into a potentially high-risk system)",
+        "outcome": "Flag cross-dependency: the high-risk downstream provider needs sufficient information/cooperation from the GPAI model provider to meet high-risk obligations. Defer full high-risk classification to the later high-risk module; raise a cross-module consistency note.",
+        "legal_basis_citation": "Article 25(4); Article 53(1)(b); Annex XII",
+        "applicable_from_date": "2027-12-02",
+        "guidance_status": "draft",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "GPAI-R9",
+        "name": "Copyright policy and training-content summary",
+        "condition": "gpai_q1 = Yes (any GPAI provider, including open-source)",
+        "outcome": "Flag mandatory EU copyright-compliance policy and public sufficiently-detailed training-content summary (AI Office template). Applies regardless of open-source status.",
+        "legal_basis_citation": "Article 53(1)(c); Article 53(1)(d)",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      }
+    ]
+  },
+
+  "Result Object": {
+    "description": "Per-system, per-module GPAI assessment output.",
+    "classification_or_status": {
+      "values": [
+        "likely GPAI provider (Article 53)",
+        "likely GPAI provider with possible systemic risk (Article 55) — needs review",
+        "likely downstream provider/deployer building on third-party GPAI",
+        "GPAI integrated into potentially high-risk system — needs review",
+        "GPAI obligations unlikely to apply",
+        "insufficient information"
+      ],
+      "note": "Uses 'likely/possible/needs review' wording only — never 'compliant' or 'legally confirmed'."
+    },
+    "confidence_score": "0-100 deterministic score. Start at 100; subtract 15 per core 'Not sure' (is-a-GPAI-model, training-compute, model-provider); subtract 25 if systemic-risk status unknown but model is large; subtract 20 if downstream information receipt unknown; subtract 10 for each missing essential field (cap -40); subtract 15 for contradictory answers. Clamp 0-100.",
+    "confidence_label": "high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic generated text, e.g. 'This system is likely subject to Article 53 GPAI-provider obligations because the organisation develops a general-purpose model placed on the EU market. Systemic-risk status is uncertain because training compute is not stated and no Commission designation is recorded.'",
+    "positive_indicators": [
+      "Organisation develops or places a GPAI model on the market",
+      "Training compute reported above 10^25 FLOP",
+      "Commission/AI Office systemic-risk designation recorded",
+      "System builds on or fine-tunes a third-party GPAI model",
+      "GPAI model integrated into a potentially high-risk context"
+    ],
+    "negative_indicators": [
+      "No general-purpose model developed or provided",
+      "Narrow single-purpose system with no GPAI/LLM component",
+      "Training compute clearly below threshold and no qualitative systemic-risk signals",
+      "Model used only as an unmodified downstream consumer with obligations resting upstream"
+    ],
+    "key_uncertainties": [
+      "Systemic-risk designation beyond the 10^25 FLOP presumption depends on a Commission decision using Annex XIII capability/user-base/scalability/autonomy criteria — not a fixed rule.",
+      "Whether fine-tuning/modification crosses the threshold to make the organisation a provider of the modified model.",
+      "Whether Annex XII information was actually received from the upstream GPAI provider.",
+      "Training compute (FLOP) often not disclosed by vendors."
+    ],
+    "missing_fields": [
+      "training_compute_flop",
+      "gpai_provider_name",
+      "systemic_risk_designation_status",
+      "annex_xii_information_received",
+      "fine_tuning_compute"
+    ],
+    "recommended_next_questions": [
+      "Confirm the training compute (FLOP) of the model, from provider or vendor documentation.",
+      "Confirm whether the upstream GPAI provider has supplied the Annex XII integration information.",
+      "Confirm whether any fine-tuning materially changed the model's capabilities or intended purpose.",
+      "Check whether the model appears on any published Commission list of systemic-risk GPAI models."
+    ],
+    "role_conditional_obligation": {
+      "description": "Same model yields different duties by entity role, keyed to Module 2 output.",
+      "GPAI_model_provider": "Article 53 (technical docs Annex XI, downstream info Annex XII, copyright policy, training-content summary); Article 55 if systemic-risk; Article 54 EU authorised representative if provider is established outside the EU.",
+      "downstream_provider_deployer": "Rely on Annex XII information from upstream; own obligations depend on the system role and later high-risk/transparency modules; no Article 53 model-provider duties unless converted by modification.",
+      "modifier_fine_tuner": "May inherit Article 53 (scoped to the modification) via Article 25; re-evaluate on Module 9 reclassification trigger."
+    },
+    "reclassification_trigger_flags": {
+      "substantial_modification": "gpai_q6 = Yes",
+      "rebranded": "[uncertain] captured in Module 2; re-check if own brand applied to a third-party model",
+      "purpose_changed_to_high_risk": "gpai_q7 = Yes combined with a purpose change",
+      "fine_tuned_over_compute_threshold": "gpai_q6 = Yes AND fine-tuning compute above systemic-risk threshold"
+    },
+    "registration_required": "Not the primary GPAI trigger. GPAI providers do not register in the Annex VIII high-risk database, but systemic-risk providers must NOTIFY the Commission (Article 52) within 2 weeks; if the GPAI is embedded in a high-risk system, Article 49/Annex VIII registration applies at the system level.",
+    "standards_conformity_route": "Compliance with the GPAI Code of Practice (Article 56) provides a presumption of conformity with Article 53/55 duties until harmonised standards exist. Not the notified-body route used for high-risk systems. [uncertain] — Code of Practice adherence status per model is provider-specific.",
+    "not_high_risk_documentation_flag": "Even where GPAI obligations do not apply, a downstream provider building on a GPAI model should document why the resulting system is not high-risk (Article 6(3) self-assessment) rather than treating 'GPAI-only' as 'nothing to do'."
+  },
+
+  "UI Pattern": {
+    "summary_cards": [
+      "Total systems with a GPAI/LLM component",
+      "Likely GPAI providers (Article 53)",
+      "Possible systemic-risk GPAI (Article 55) — needs review",
+      "Downstream systems building on third-party GPAI",
+      "GPAI integrated into potentially high-risk systems",
+      "Insufficient information"
+    ],
+    "results_table": {
+      "columns": ["System name", "GPAI role", "Model provider", "GPAI status", "Systemic-risk flag", "Confidence", "Key uncertainty", "Annex XII info received", "Last assessed", "Actions"],
+      "note": "Includes status / confidence / key-uncertainty columns at minimum."
+    },
+    "filters": ["GPAI role", "Systemic-risk flag", "Confidence label", "Model provider", "Downstream vs. provider", "Missing data"],
+    "csv_export": "Export the GPAI assessment table to CSV.",
+    "detail_page": "/gpai/systems/[id] — system overview, evidence used from Module 1, deterministic result panel, positive/negative indicators, key uncertainties, missing fields, recommended next questions, applicable dates per obligation, link back to inventory.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.",
+    "cross_module_consistency_warning": "If Module 3 flagged the item as 'not an AI system' or 'insufficient information', or if the GPAI is integrated into a system whose high-risk status is still unresolved, warn that GPAI/high-risk obligations should be reviewed before relying on this output."
+  },
+
+  "uncertain": [
+    "classification_or_status",
+    "reclassification_trigger_flags",
+    "standards_conformity_route",
+    "applicable_from_date",
+    "guidance_status"
+  ]
+}

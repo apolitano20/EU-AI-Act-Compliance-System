@@ -1,0 +1,139 @@
+{
+  "module_id": "module-8",
+  "module_name": "AI Literacy",
+  "flowchart_section": null,
+  "legal_basis": ["Article 4"],
+  "depends_on": ["module-1", "module-2"],
+  "new": true,
+  "description": "Article 4 requires providers and deployers to take measures ensuring a sufficient level of AI literacy of their staff and other persons operating/using AI systems on their behalf. It applies horizontally to every AI system regardless of risk tier (including minimal-risk and systems otherwise excluded from other obligations), which is why it cannot be nested inside the high-risk path. In force since 2025-02-02. The Digital Omnibus simplification package softens this into an obligation of effort ('support the development of' AI literacy) rather than an obligation of result ('ensure a sufficient level'), and shifts part of the burden to Member States/Commission to encourage such measures.",
+
+  "questionnaire": [
+    {
+      "question_text": "Does your organisation use, operate, or provide any AI system in the course of its professional activity?",
+      "helper_text": "This covers systems you build (provider) and systems you merely deploy/use (deployer). It includes minimal-risk and general-purpose systems such as chatbots, coding assistants, or off-the-shelf ML tools. If your organisation touches any AI system at all in a professional context, answer Yes.",
+      "answer_options": ["Yes", "No", "Not sure"],
+      "reused_from": "module-1 (any AISystem inventory record) / module-3 (is-an-AI-system gate)"
+    },
+    {
+      "question_text": "What is your organisation's role with respect to this AI system?",
+      "helper_text": "Provider = you develop it or have it developed and place it on the market/put it into service under your own name or trademark. Deployer = you use an AI system under your own authority in a professional context. Article 4 applies to both provider and deployer roles.",
+      "answer_options": ["Provider", "Deployer", "Both", "Neither (importer/distributor only)", "Not sure"],
+      "reused_from": "module-2 (entity-type role classification)"
+    },
+    {
+      "question_text": "Have you put in place any measures to build AI knowledge and skills among the staff who operate or use this system (e.g. training, guidelines, onboarding, usage policies)?",
+      "helper_text": "'Measures' can be proportionate to context: for a small team using a low-risk tool this may be short internal guidance; for staff operating a high-risk system it should reflect the system's risk, the technical knowledge/experience of those people, and the context of use. There is no mandated curriculum.",
+      "answer_options": ["Yes, documented", "Yes, informal only", "No", "Not sure"],
+      "reused_from": null
+    },
+    {
+      "question_text": "Do the people who operate or are affected by this system have the technical knowledge, experience, and training needed to understand its capabilities, limitations, and the risks it poses?",
+      "helper_text": "AI literacy must account for the persons' prior knowledge/experience and the context in which the system is used, including who is affected by its outputs. Answer No if any operating staff use the system without understanding what it can and cannot reliably do.",
+      "answer_options": ["Yes", "Partially", "No", "Not sure"],
+      "reused_from": null
+    }
+  ],
+
+  "deterministic_rules": [
+    {
+      "rule_id": "AILIT-1-applies-to-all-tiers",
+      "rule_logic": "IF organisation is a provider OR deployer of at least one AI system (module-2 role IN {provider, deployer, both}) THEN Article 4 AI literacy obligation applies, irrespective of the system's risk classification (module-5 exclusion / module-7 high-risk outcome does NOT switch it off).",
+      "legal_basis_citation": "Article 4; Recital 20",
+      "applicable_from_date": "2025-02-02",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "AILIT-2-role-scope",
+      "rule_logic": "Obligation attaches only to provider and deployer roles. Pure importer/distributor roles are NOT directly subject to Article 4 (unless reclassified to provider via module-9). IF module-2 role == importer_only OR distributor_only THEN mark not_applicable pending module-9 reclassification check.",
+      "legal_basis_citation": "Article 4 (addressees: 'providers and deployers'); Article 3(3)/(4) role definitions",
+      "applicable_from_date": "2025-02-02",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "AILIT-3-proportionality",
+      "rule_logic": "Required level of measures is proportionate: evaluate against (a) technical knowledge/experience/education/training of the persons, (b) the context the system is used in, and (c) the persons/groups on whom the system is used. No fixed certification threshold; absence of ANY measures for staff operating a higher-risk system lowers confidence in readiness.",
+      "legal_basis_citation": "Article 4, second sentence",
+      "applicable_from_date": "2025-02-02",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "AILIT-4-omnibus-softening",
+      "rule_logic": "IN-FLUX: Digital Omnibus reframes Article 4 as an obligation of effort ('take appropriate measures to support the development of AI literacy') rather than result ('ensure a sufficient level'), and adds a Member-State/Commission duty to encourage such measures. Until published in the Official Journal, retain the current in-force text as the operative rule and surface the softening as a forward-looking note, not the binding standard.",
+      "legal_basis_citation": "Digital Omnibus amendment to Article 4 (AI Act simplification package)",
+      "applicable_from_date": "not_yet_in_force (OJ publication expected before 2026-08-02; Council final approval 2026-06-29, Parliament endorsement 2026-06-16)",
+      "guidance_status": "draft",
+      "source_version_date": "2026-07-07"
+    }
+  ],
+
+  "result_object": {
+    "classification_or_status": "AI literacy obligation likely applies (horizontal, all risk tiers) — organisational measures needed for provider/deployer staff",
+    "confidence_score": 90,
+    "confidence_label": "high",
+    "reasoning_summary": "Article 4 is a horizontal obligation binding on any provider or deployer of an AI system since 2025-02-02, independent of risk classification. Where module-2 assigns a provider or deployer role and module-3 confirms an AI system exists, the obligation applies with high confidence. Confidence is capped below certainty only because (a) the concrete adequacy of measures is judgement-based and proportionate, and (b) the Digital Omnibus softening to an effort-based duty is imminent but not yet published, which may lower the compliance bar retroactively for readiness purposes.",
+    "positive_indicators": [
+      "Organisation is a provider and/or deployer of at least one AI system (module-2)",
+      "Obligation is already in force (since 2025-02-02) and not deferred by the Omnibus timeline split",
+      "Applies regardless of risk tier, so no dependence on module-7 high-risk outcome",
+      "Documented training/guidelines already in place (if questionnaire Q3 == 'Yes, documented')"
+    ],
+    "negative_indicators": [
+      "Organisation is importer/distributor only with no provider/deployer role and no module-9 reclassification",
+      "No AI system present (module-3 gate not passed)",
+      "No measures of any kind in place for staff operating the system (weakens readiness, does not remove the obligation)"
+    ],
+    "key_uncertainties": [
+      "Whether Article 4 remains an obligation of result or is softened to an effort-based duty depends on final Digital Omnibus text not yet published in the OJ",
+      "What counts as 'sufficient' AI literacy is context- and proportionality-dependent, with no fixed threshold",
+      "Whether informal, undocumented measures satisfy the obligation in an enforcement context"
+    ],
+    "missing_fields": [
+      "module-2 role classification (provider vs deployer vs importer/distributor)",
+      "presence/description of existing AI-literacy measures (not captured in modules 1-3)"
+    ],
+    "recommended_next_questions": [
+      "Do you maintain a record of the AI-literacy measures taken (training logs, policies, onboarding materials)?",
+      "Are measures differentiated by the risk level of each system and the role of the staff using it?",
+      "Who in the organisation owns AI-literacy compliance, and is it reviewed periodically?"
+    ],
+    "role_conditional_obligation": {
+      "provider": "Must take measures to ensure sufficient AI literacy of own staff and others operating/using the system on the provider's behalf.",
+      "deployer": "Must take measures to ensure sufficient AI literacy of staff and others operating/using the system under the deployer's authority.",
+      "importer": "Not directly obligated under Article 4 unless reclassified to provider (module-9).",
+      "distributor": "Not directly obligated under Article 4 unless reclassified to provider (module-9).",
+      "authorised_representative": "Not a direct Article 4 addressee; obligation stays with the represented provider."
+    },
+    "reclassification_trigger_flags": {
+      "substantial_modification": false,
+      "rebranded": false,
+      "purpose_changed_to_high_risk": false,
+      "note": "Article 4 applies to provider and deployer roles alike, so reclassification (module-9) does not create a new AI-literacy duty for a deployer that already had one; it is relevant only for an importer/distributor being promoted into provider scope."
+    },
+    "registration_required": "not_applicable — Article 4 carries no EU-database registration duty of its own",
+    "standards_conformity_route": "not_applicable — AI literacy is not subject to harmonised-standards presumption-of-conformity or notified-body assessment",
+    "not_high_risk_documentation_flag": "not_applicable — Article 6(3) not-high-risk self-assessment documentation is a high-risk-classification concern (module-7), not an Article 4 concern; however keeping internal evidence of AI-literacy measures is advisable for enforcement readiness"
+  },
+
+  "ui_pattern": {
+    "summary_cards": [
+      "Applies to all AI systems (horizontal) — Yes",
+      "In force since 2025-02-02",
+      "Status: softening pending (Digital Omnibus, guidance_status: draft)"
+    ],
+    "results_table": "Columns: System | Role (provider/deployer) | Obligation applies (Y/N) | Measures in place (documented/informal/none) | Status | Confidence | Key uncertainty",
+    "filters": ["role", "measures-in-place", "confidence_label", "guidance_status"],
+    "csv_export": "Export per-system AI-literacy status with legal_basis_citation and applicable_from_date columns for module-15 report aggregation.",
+    "detail_page": "Shows the four questionnaire answers, the triggered deterministic rules with citations, the role_conditional_obligation breakdown, and an in-flux banner for the Omnibus softening.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and does not guarantee compliance with the EU AI Act. Confirm obligations with qualified counsel.",
+    "cross_module_consistency_warning": "If module-2 role classification is 'needs review' or module-3 AI-system gate is uncertain, warn that the Article 4 applicability determination inherits that uncertainty. Also surface an in-flux warning that the Digital Omnibus may soften Article 4 to an effort-based duty (guidance_status: draft) before final adoption."
+  },
+
+  "uncertain": [
+    "guidance_status (rule AILIT-4 depends on final Digital Omnibus text not yet published in the Official Journal)",
+    "applicable_from_date (Omnibus softening OJ publication date not yet fixed; expected before 2026-08-02)",
+    "not_high_risk_documentation_flag"
+  ]
+}

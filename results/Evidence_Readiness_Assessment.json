@@ -1,0 +1,206 @@
+{
+  "module_id": "module-13",
+  "module_name": "Evidence & Readiness Assessment",
+  "flowchart_section": null,
+  "flowchart_section_note": "Practical add-on, not in the Future of Life Institute flowchart.",
+  "legal_basis": [
+    "Article 9-15", "Article 17", "Article 26", "Article 43", "Article 47-49", "Article 72-73",
+    "Annex IV (technical documentation)", "Annex VIII (registration)"
+  ],
+  "depends_on": ["module-12"],
+  "description": "Turns each Obligations Matrix row (Module 12) into an evidence-gap checklist: for the obligation, what documentation/controls are required by the underlying article versus what the organisation actually has. Does not re-derive whether an obligation applies (that is Module 12); it only assesses readiness state (evidence in place / partial / gap / not started) per applicable obligation and rolls the rows up into a system-level readiness score. Reuses Module 12's obligation set, role-conditional obligations, registration and conformity flags rather than recomputing them.",
+
+  "Questionnaire": {
+    "description": "One evidence question per applicable Module 12 obligation row. Seeded from Module 12; only shown for obligations that actually apply to the system/role. Options: In place / Partial / Not started / Not sure / Not applicable.",
+    "fields": [
+      {
+        "question_text": "Do you have a documented risk-management process for this system, kept up to date across its lifecycle?",
+        "helper_text": "Article 9 evidence: a risk-management plan/policy, a maintained risk register, residual-risk analysis and testing records. 'A spreadsheet once' is partial, not in place.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART9-RMS"
+      },
+      {
+        "question_text": "Do you have data governance documentation for the training, validation and testing data?",
+        "helper_text": "Article 10 evidence: data governance policy, dataset documentation, provenance records, and bias/representativeness examination.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART10-DATA"
+      },
+      {
+        "question_text": "Does a technical documentation file covering the Annex IV contents exist and is it current?",
+        "helper_text": "Article 11 / Annex IV evidence: the technical documentation file. It must exist before market placement and be maintained.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART11-TECHDOC"
+      },
+      {
+        "question_text": "Does the system automatically log events, and are logs retained under a retention policy?",
+        "helper_text": "Article 12 evidence: logging design/spec, retained logs, and a retention policy.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART12-LOGGING"
+      },
+      {
+        "question_text": "Have you prepared instructions for use / transparency documentation for deployers?",
+        "helper_text": "Article 13 evidence: deployer-facing instructions for use covering capabilities, limitations, human oversight and declared accuracy.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART13-TRANSP-DEPLOYER"
+      },
+      {
+        "question_text": "Are human-oversight measures designed into the system and documented (and, if you are the deployer, operationally assigned)?",
+        "helper_text": "Article 14 (provider design) and Article 26 (deployer implementation) evidence: oversight measures design, operator instructions, assigned oversight roles and training.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligations OBL-ART14-OVERSIGHT, OBL-ART26-DEPLOYER"
+      },
+      {
+        "question_text": "Do you have accuracy, robustness and cybersecurity evidence for the system?",
+        "helper_text": "Article 15 evidence: declared accuracy metrics (stated in the instructions for use), robustness/adversarial test reports, and cybersecurity measures / threat model.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART15-ACCURACY"
+      },
+      {
+        "question_text": "Is there a documented quality management system covering this system?",
+        "helper_text": "Article 17 evidence: QMS documentation, procedures, responsibilities and record-keeping that tie the Article 9-15 duties together.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART17-QMS"
+      },
+      {
+        "question_text": "Has conformity assessment been completed, with an EU declaration of conformity and CE marking evidence (plus a notified-body certificate where required)?",
+        "helper_text": "Articles 43/47/48 evidence: conformity assessment records, signed EU declaration of conformity, CE marking evidence, and — on the Annex VII route — a notified-body certificate.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART43-CONFORMITY; standards_conformity_route"
+      },
+      {
+        "question_text": "Is the system (or the Article 6(3) not-high-risk self-assessment) registered in the EU database?",
+        "helper_text": "Article 49 / Annex VIII evidence: the registration entry. For a claimed not-high-risk derogation, the documented Article 6(3) self-assessment must also be registered. Note the non-public registration variant for law-enforcement/migration/border systems.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligations OBL-ART49-REGISTER, OBL-ART6-3-NOTHR-DOC; registration_required"
+      },
+      {
+        "question_text": "Do you have a post-market monitoring plan and are you collecting monitoring data?",
+        "helper_text": "Article 72 evidence: a documented post-market monitoring plan plus evidence of ongoing data collection — this is a recurring control, not a one-off document.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART72-PMM"
+      },
+      {
+        "question_text": "Is there a serious-incident reporting procedure with an owner and defined reporting timelines?",
+        "helper_text": "Article 73 evidence: a documented reporting procedure, an assigned owner, and awareness of the statutory reporting deadlines. Readiness (procedure + owner) is what is assessed, since incidents are event-driven.",
+        "answer_options": ["In place", "Partial", "Not started", "Not sure", "Not applicable"],
+        "reused_from": "module-12 obligation OBL-ART73-INCIDENT"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "description": "Rules file (src/lib/evidence/evidenceRules.ts). For each applicable Module 12 obligation, a static required-artifact list is compared to the answered evidence state to derive a per-obligation readiness_status. No LLM reasoning. Carries through the legal_basis_citation, applicable_from_date and guidance_status of the parent Module 12 row so remediation (Module 14) and the final report (Module 15) can cite the source and see which deadline drives urgency.",
+    "readiness_mapping": {
+      "In place": "evidence_in_place",
+      "Partial": "partial_evidence",
+      "Not started": "evidence_gap",
+      "Not sure": "unknown_evidence_state",
+      "Not applicable": "not_applicable"
+    },
+    "gap_scoring_logic": "system readiness_score = 100 * (weighted evidence_in_place obligations) / (applicable obligations), where partial counts 0.5 and unknown counts 0. Obligations with a nearer applicable_from_date are weighted higher for prioritisation (not for the raw score).",
+    "legal_basis_citation": "Inherited per obligation from Module 12 (e.g. Article 9 for the risk-management evidence row).",
+    "applicable_from_date": "Inherited per obligation from Module 12; high-risk rows carry the provisional 2027-12-02 / 2028-08-02 dates.",
+    "guidance_status": "Inherited per obligation from Module 12 (final / provisional / draft).",
+    "source_version_date": "2026-07-07",
+    "required_evidence_by_obligation": [
+      {"obligation_id": "OBL-ART9-RMS", "required_artifacts": ["risk-management plan/policy", "maintained risk register", "residual-risk analysis", "testing records"], "legal_basis_citation": "Article 9", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART10-DATA", "required_artifacts": ["data governance policy", "dataset documentation", "data provenance records", "bias/representativeness examination"], "legal_basis_citation": "Article 10", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART11-TECHDOC", "required_artifacts": ["Annex IV technical documentation file"], "legal_basis_citation": "Article 11; Annex IV", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART12-LOGGING", "required_artifacts": ["logging design/spec", "retained logs", "log retention policy"], "legal_basis_citation": "Article 12", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART13-TRANSP-DEPLOYER", "required_artifacts": ["instructions for use", "deployer-facing documentation"], "legal_basis_citation": "Article 13", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART14-OVERSIGHT", "required_artifacts": ["human oversight measures design", "operator instructions/training"], "legal_basis_citation": "Article 14; Article 26 (deployer)", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART15-ACCURACY", "required_artifacts": ["declared accuracy metrics", "robustness/adversarial test reports", "cybersecurity measures / threat model"], "legal_basis_citation": "Article 15", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART17-QMS", "required_artifacts": ["QMS documentation", "procedures and responsibilities", "record-keeping"], "legal_basis_citation": "Article 17", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART26-DEPLOYER", "required_artifacts": ["use-per-instructions records", "assigned human oversight", "operation monitoring", "retained logs", "worker information notice", "FRIA where Article 27 applies"], "legal_basis_citation": "Article 26; Article 27", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART43-CONFORMITY", "required_artifacts": ["conformity assessment records", "EU declaration of conformity", "CE marking evidence", "notified-body certificate (Annex VII route only)"], "legal_basis_citation": "Article 43; Article 47; Article 48", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART49-REGISTER", "required_artifacts": ["EU database registration entry (Annex VIII)"], "legal_basis_citation": "Article 49; Annex VIII", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART6-3-NOTHR-DOC", "required_artifacts": ["documented Article 6(3) no-significant-risk self-assessment", "registration of that assessment"], "legal_basis_citation": "Article 6(3); Article 49", "applicable_from_date": "2027-12-02 [uncertain]", "guidance_status": "draft", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART72-PMM", "required_artifacts": ["post-market monitoring plan", "monitoring data collection evidence"], "legal_basis_citation": "Article 72; Recital 166", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"},
+      {"obligation_id": "OBL-ART73-INCIDENT", "required_artifacts": ["serious-incident reporting procedure", "assigned owner", "reporting timeline awareness", "incident log"], "legal_basis_citation": "Article 73", "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]", "guidance_status": "provisional", "source_version_date": "2026-07-07"}
+    ]
+  },
+
+  "Result Object": {
+    "description": "Per-system readiness roll-up plus per-obligation evidence rows.",
+    "classification_or_status": "Per-obligation readiness label: 'evidence in place' / 'partial evidence' / 'evidence gap' / 'not started' / 'unknown' / 'not applicable'; plus a system-level 'X of Y applicable obligations have evidence in place' summary. Factual readiness wording only — never 'compliant'.",
+    "confidence_score": "0-100 deterministic, measuring confidence in the readiness picture (not compliance). Start at 100; subtract 15 per obligation answered 'Not sure', 20 if the parent Module 12 obligation set is itself 'needs review', 10 if required_artifacts for an applicable obligation were left unanswered. Example: all applicable obligations answered, matrix stable = 90.",
+    "confidence_label": "high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic text, e.g. 'Of 12 applicable obligations, 4 have evidence in place, 3 are partial and 5 are gaps. The nearest provisional deadline (2027-12-02, Annex III) drives priority; technical documentation (Art 11) and conformity assessment (Art 43) are the largest gaps. Readiness confidence is medium because 2 obligations are marked Not sure.'",
+    "positive_indicators": [
+      "Core Article 9-15 evidence artifacts exist and are current",
+      "EU declaration of conformity and CE marking evidence present",
+      "Registration entry exists (or Article 6(3) assessment documented and registered)",
+      "Post-market monitoring and incident-reporting procedures are documented with owners"
+    ],
+    "negative_indicators": [
+      "No technical documentation file (Annex IV) despite high-risk classification",
+      "No conformity assessment / declaration of conformity",
+      "Post-market monitoring or incident-reporting exists only as intent, not documented control",
+      "Required evidence questions left as 'Not sure'"
+    ],
+    "key_uncertainties": [
+      "Deadlines driving remediation urgency are provisional (Digital Omnibus not adopted); a gap may be more or less urgent than shown.",
+      "Whether the conformity route is self-assessment or notified-body (affects how much evidence and lead time a gap needs).",
+      "Whether the non-public registration variant applies, changing what 'registered' means as evidence."
+    ],
+    "missing_fields": [
+      "Answered evidence state for one or more applicable obligations",
+      "module-12 obligation set (this module cannot run until the matrix is generated)",
+      "standards_conformity_route (needed to scope the conformity-assessment evidence list)"
+    ],
+    "recommended_next_questions": [
+      "For each 'Partial' obligation, what specific artifact is missing (policy, records, testing, sign-off)?",
+      "Who owns the technical documentation file and when was it last updated?",
+      "Has the EU declaration of conformity been signed, and by whom?",
+      "Is the post-market monitoring plan actively collecting data, or only drafted?"
+    ],
+    "role_conditional_obligation": {
+      "description": "Carried through from Module 12 — the evidence checklist only lists obligations for the roles the system holds; a provider checklist is far longer than a distributor checklist.",
+      "note": "Inherited, not recomputed. Re-runs if a Module 9 reclassification changes the Module 12 role set."
+    },
+    "reclassification_trigger_flags": {
+      "description": "Inherited from Module 12. If set, the evidence checklist must be regenerated against the provider obligation set before readiness is trusted.",
+      "substantial_modification": "[uncertain]",
+      "rebranded": "[uncertain]",
+      "purpose_changed_to_high_risk": "[uncertain]"
+    },
+    "registration_required": {
+      "description": "Inherited from Module 12; drives a specific evidence row (registration entry exists yes/no).",
+      "evidence_row": "EU database registration entry (Annex VIII); Article 6(3) assessment registration where derogation claimed",
+      "non_public_variant_law_enforcement_migration_border": "[uncertain]"
+    },
+    "standards_conformity_route": {
+      "description": "Inherited from Module 12; determines whether the conformity-assessment evidence row requires a notified-body certificate or only internal-control records.",
+      "route": "harmonised_standards (Annex VI) | notified_body (Annex VII) [uncertain]",
+      "note": "Notified-body route materially increases required evidence and lead time; flag as a readiness risk when standards are not yet published."
+    },
+    "not_high_risk_documentation_flag": {
+      "description": "Inherited from Module 12; when set, the checklist includes the Article 6(3) self-assessment + registration as a required evidence row so 'not high-risk' is not treated as 'no evidence needed'.",
+      "value": "carried through from Module 12 OBL-ART6-3-NOTHR-DOC"
+    }
+  },
+
+  "UI Pattern": {
+    "summary_cards": [
+      "Total applicable obligations", "Evidence in place", "Partial evidence", "Evidence gaps",
+      "Not started", "Unknown state", "Obligations past/near a deadline", "Overall readiness %"
+    ],
+    "results_table": {
+      "description": "One row per system x obligation.",
+      "columns": ["System name", "Obligation", "Legal basis", "Applicable from", "Guidance status", "Required evidence", "Readiness status", "Confidence", "Key uncertainty", "Owner (if set)", "Actions"]
+    },
+    "filters": ["Readiness status", "Obligation", "Role", "Guidance status (final/provisional/draft)", "Applicable-from date range", "Confidence", "Owner assigned"],
+    "csv_export": "Exports the per-obligation evidence rows with required_artifacts, readiness_status, legal_basis_citation and applicable_from_date so Module 14 remediation and Module 15 reporting can consume them directly.",
+    "detail_page": "Per-system evidence checklist grouped by obligation; each row shows the required artifacts, the answered evidence state, the gap, the legal basis and deadline badge, and a 'create remediation item' hand-off to Module 14.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.",
+    "cross_module_consistency_warning": "Flag when the parent Module 12 obligation set is 'needs review' or an upstream classification is uncertain — e.g. 'This evidence checklist was generated from an obligations matrix still marked needs review; gaps may be over- or under-stated until the classification is confirmed.'"
+  },
+
+  "uncertain": [
+    "applicable_from_date (all high-risk evidence rows inherit the provisional 2027-12-02 / 2028-08-02 dates)",
+    "guidance_status (high-risk rows = provisional; Article 6(3) row = draft)",
+    "reclassification_trigger_flags (inherited per system from Module 9 via Module 12)",
+    "registration_required.non_public_variant_law_enforcement_migration_border",
+    "standards_conformity_route.route (drives whether notified-body evidence is required)"
+  ]
+}

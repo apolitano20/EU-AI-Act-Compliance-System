@@ -1,0 +1,174 @@
+topic: "EU AI Act Compliance Readiness Dashboard — remaining modules (4-15)"
+generated: 2026-07-07
+source_documents:
+  - AI-Act-Compliance-Checker-Flowchart.pdf   # Future of Life Institute, published 2025-07-28
+  - HANDOFF.md
+  - modules_mds/module-1-inventory.md
+  - modules_mds/module-2-entity-type.md
+  - modules_mds/module-3-ai-system-definition-gate.md
+
+already_built:
+  - id: module-1
+    name: AI System Inventory
+  - id: module-2
+    name: Entity Type / Role Classification
+    flowchart_section: "#E Entity"
+  - id: module-3
+    name: AI System Definition Gate
+    flowchart_section: "Is my system an 'AI System'? (top gate)"
+
+items:
+  - id: module-4
+    name: EU Scope & Applicability
+    flowchart_section: "#S Scope"
+    legal_basis: [Article 2, Article 22]
+    depends_on: [module-1, module-2]
+    description: >
+      Determines whether the AI Act applies at all, based on where the provider/deployer
+      is established and where system outputs are used. Extended per research findings
+      with an Article 22 question: does a non-EU provider of a high-risk system/GPAI
+      model need to appoint an EU authorised representative before market placement.
+
+  - id: module-5
+    name: Exclusions
+    flowchart_section: "#R2"
+    legal_basis: [Article 2]
+    depends_on: [module-1, module-3, module-4]
+    description: >
+      Military/national-security exclusion, third-country law-enforcement exclusion,
+      research & development exclusion, open-source exclusion, personal/non-professional
+      use exclusion.
+
+  - id: module-6
+    name: Prohibited AI Practices
+    flowchart_section: "#R3"
+    legal_basis: [Article 5]
+    depends_on: [module-1, module-5]
+    description: >
+      Subliminal manipulation, exploiting vulnerabilities, social scoring, predictive
+      policing, biometric categorisation, workplace/education emotion recognition,
+      real-time remote biometric ID, facial recognition database scraping. Extended
+      per research findings with the new Digital Omnibus (2026-05) Article 5 prohibition
+      on AI "nudifiers" / non-consensual intimate imagery and CSAM generation.
+
+  - id: module-7
+    name: High-Risk Classification
+    flowchart_section: "#HR1-#HR6"
+    legal_basis: [Article 6, Annex I, Annex III]
+    depends_on: [module-1, module-2, module-5, module-6]
+    description: >
+      Annex I Section A/B product-safety categories requiring third-party conformity
+      assessment, Annex III use-case categories (biometrics, critical infrastructure,
+      education, employment, essential services, law enforcement, migration,
+      justice/democratic processes), significant-risk carve-outs.
+    note: >
+      Draft Commission guidelines on high-risk classification (published 2026-05-19,
+      consultation closed 2026-06-23) are not yet final — tag rules derived from them
+      with guidance_status: draft.
+
+  - id: module-8
+    name: AI Literacy
+    flowchart_section: null   # not in flowchart; research-identified gap
+    legal_basis: [Article 4]
+    depends_on: [module-1, module-2]
+    new: true
+    description: >
+      Applies to every AI system regardless of risk tier — providers and deployers must
+      take measures ensuring sufficient AI literacy of staff. In force since 2025-02-02.
+      Cannot be nested inside the high-risk path since it applies to excluded/minimal-risk
+      systems too. Note: Digital Omnibus proposes softening this to a Member-State/
+      Commission promotion duty rather than a firm organisational obligation — flag as
+      in-flux (guidance_status: draft) until final Omnibus text adopted.
+
+  - id: module-9
+    name: Value-Chain Reclassification
+    flowchart_section: "Article 25 provider-conversion risk (referenced but not fully modeled in Module 2)"
+    legal_basis: [Article 25]
+    depends_on: [module-1, module-2]
+    new: true
+    description: >
+      A deployer/distributor/importer becomes a "provider" — and inherits the full
+      provider obligation set — if they (a) substantially modify the system, (b) put
+      their own name/trademark on it, or (c) change its intended purpose so it becomes
+      high-risk. Module 2 already collects the raw signals (Article25ProviderConversionRisk
+      flag); this module turns that flag into an explicit reclassification determination
+      that feeds the Obligations Matrix.
+
+  - id: module-10
+    name: GPAI Obligations
+    flowchart_section: "#R1"
+    legal_basis: [Article 51, Article 53, Article 55]
+    depends_on: [module-1]
+    description: >
+      General-purpose AI model obligations; systemic-risk designation. Extended per
+      research findings with the reciprocal downstream question set: does the
+      organisation build on a third-party GPAI model (Article 25/53 information-flow
+      obligations), and is a GPAI model integrated into a high-risk system. Note:
+      systemic-risk is not purely the 10^25 FLOP threshold — the Commission can also
+      designate on capability/user-base/autonomy criteria; surface as an uncertainty
+      rather than a hard rule.
+
+  - id: module-11
+    name: Transparency Obligations
+    flowchart_section: "#R4, #R5"
+    legal_basis: [Article 50, Article 27]
+    depends_on: [module-2, module-7]
+    description: >
+      Deepfakes, AI-generated text on public-interest matters, emotion recognition/
+      biometric categorisation disclosure, direct interaction disclosure, synthetic
+      content labelling. Fundamental Rights Impact Assessment (FRIA) kept as a distinct,
+      separately-surfaced sub-section per research findings (not just bundled into
+      general transparency) since it has its own trigger set: public bodies, private
+      providers of public services, and deployers doing creditworthiness/credit-scoring
+      or life/health insurance risk assessment.
+
+  - id: module-12
+    name: Obligations Matrix
+    flowchart_section: "Understanding your obligations"
+    legal_basis: [Article 9-15, Article 17, Article 22-24, Article 26, Article 43,
+                  Article 47-49, Article 72-73, Recital 47, Recital 166]
+    depends_on: [module-2, module-4, module-6, module-7, module-8, module-9, module-10, module-11]
+    description: >
+      Aggregates entity role + AI-system-definition + scope/exclusion/prohibited/
+      high-risk/GPAI/transparency/reclassification status into a consolidated
+      per-system obligations checklist. Per research findings, decomposed into
+      concrete obligation rows rather than left as article-level references:
+      risk-management system (Art 9), data governance (10), technical documentation
+      (11), logging/record-keeping (12), transparency-to-deployers/instructions (13),
+      human oversight (14), accuracy/robustness/cybersecurity (15), quality-management
+      system (17), EU database registration (49) including the Article 6(3)
+      not-high-risk documentation duty, conformity assessment route + CE marking
+      (43, 47-48), post-market monitoring and serious-incident reporting (72-73,
+      recurring/lifecycle obligations).
+
+  - id: module-13
+    name: Evidence & Readiness Assessment
+    flowchart_section: null   # practical add-on, not in flowchart
+    depends_on: [module-12]
+    description: >
+      Turns each Obligations Matrix row into an evidence-gap checklist — what
+      documentation/controls exist vs. required for that obligation.
+
+  - id: module-14
+    name: Remediation Tracker
+    flowchart_section: null   # practical add-on, not in flowchart
+    depends_on: [module-13]
+    description: >
+      Action items with owners and due dates addressing evidence gaps. Should support
+      recurring items (post-market monitoring, incident-reporting readiness) not just
+      one-off tasks.
+
+  - id: module-15
+    name: Final Report Generator
+    flowchart_section: null   # practical add-on, not in flowchart
+    depends_on: [module-1, module-2, module-3, module-4, module-5, module-6, module-7,
+                 module-8, module-9, module-10, module-11, module-12, module-13, module-14]
+    description: >
+      Aggregates all modules across all inventory systems into an exportable
+      compliance-readiness report, citing legal_basis per obligation and flagging any
+      obligation whose rule rests on draft/provisional guidance.
+
+execution:
+  batch_size: 5
+  items_per_agent: 2
+  output_dir: ./results

@@ -1,0 +1,196 @@
+{
+  "module_id": "module-7",
+  "module_name": "High-Risk Classification",
+  "flowchart_section": "#HR1-#HR6",
+  "legal_basis": ["Article 6", "Article 6(3)", "Annex I", "Annex III", "Article 49", "Annex VIII"],
+  "depends_on": ["module-1", "module-2", "module-5", "module-6"],
+  "description": "Classifies each non-prohibited, non-excluded AI system as high-risk or not. Two independent routes: (1) Annex I product-safety route — AI is a safety component of, or is itself, a product covered by listed EU harmonisation legislation that requires third-party conformity assessment; (2) Annex III use-case route — the system falls in one of eight listed high-risk use-case areas. Applies the Article 6(3) significant-risk carve-out and its documentation duty.",
+  "source_version_date": "2026-07-07",
+  "guidance_status": "draft",
+  "guidance_status_note": "Annex I and Annex III themselves are final law. The Commission's draft guidelines on high-risk classification (published 2026-05-19, consultation closed 2026-06-23) that clarify borderline cases and the Article 6(3) carve-out are NOT yet final — any rule derived from them carries guidance_status: draft. Enforcement dates were deferred by the Digital Omnibus (provisional agreement 2026-05-07).",
+
+  "Questionnaire": {
+    "category": "Questionnaire",
+    "detail_level": "detailed",
+    "description": "Runs only for systems that Module 5 did not exclude and Module 6 did not flag as likely_prohibited. Reuses Module 1 (sector, use case, output types, whether it is a safety component, product embedding) and Module 2 (role) before asking new questions.",
+    "questions": [
+      {
+        "id": "HR1",
+        "question_text": "Is the AI system itself a product, or a safety component of a product, that is covered by one of the EU product-safety laws listed in Annex I (e.g. machinery, medical devices, toys, lifts, radio equipment, vehicles)?",
+        "helper_text": "'Safety component' means a component whose failure endangers health or safety. Annex I Section A lists New-Legislative-Framework products; Section B lists older/transport-sector laws.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.isSafetyComponent, module-1.productEmbedding, module-1.sector"
+      },
+      {
+        "id": "HR2",
+        "question_text": "Does that product already require a conformity assessment by an independent third party (a notified body) before it can be sold or put into service?",
+        "helper_text": "This distinguishes Annex I products that pull the AI into high-risk (third-party assessment required) from those subject only to internal self-assessment.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "HR3",
+        "question_text": "Which of these describes what the system is used for?",
+        "helper_text": "Maps to the eight Annex III areas. Choose all that apply. Selecting one moves you to the significant-risk carve-out questions.",
+        "answer_options": [
+          "Biometrics (remote identification, categorisation by sensitive attributes, emotion recognition) not otherwise prohibited",
+          "Critical infrastructure (safety of digital infrastructure, road traffic, water/gas/heating/electricity supply)",
+          "Education and vocational training (admission, assessment, detecting prohibited behaviour during tests)",
+          "Employment, worker management, access to self-employment (recruitment, task allocation, promotion, termination, monitoring)",
+          "Access to essential private and public services (creditworthiness/credit scoring, life/health insurance risk & pricing, public benefits eligibility, emergency dispatch)",
+          "Law enforcement (risk assessment of offending/re-offending, polygraphs, evidence reliability, profiling)",
+          "Migration, asylum and border control (risk assessment, application examination, detection of irregular entry)",
+          "Administration of justice and democratic processes (assisting judicial authorities, influencing elections/referenda)",
+          "None of the above"
+        ],
+        "reused_from": "module-1.useCaseDescription, module-1.sector, module-1.outputTypes"
+      },
+      {
+        "id": "HR4",
+        "question_text": "Does the system carry out a narrow procedural task, or only improve the result of a task a human already completed, without materially influencing the final decision?",
+        "helper_text": "Article 6(3) carve-out condition (a)/(b). If yes, the system may NOT be high-risk despite falling in an Annex III area.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "HR5",
+        "question_text": "Does the system only detect decision-making patterns or deviations from prior patterns, and is it NOT meant to replace or influence a human assessment without proper human review?",
+        "helper_text": "Article 6(3) carve-out condition (c). Preparatory/pattern-detection tasks can qualify for the carve-out.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": null
+      },
+      {
+        "id": "HR6",
+        "question_text": "Regardless of the above, does the system perform profiling of natural persons?",
+        "helper_text": "Article 6(3) final subparagraph: an Annex III system that profiles natural persons is ALWAYS considered high-risk and cannot use the carve-out.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1.useCaseDescription"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "category": "Deterministic Rules",
+    "detail_level": "detailed",
+    "description": "src/lib/high-risk/rules.ts — deterministic. Two entry routes (Annex I, Annex III) then the Article 6(3) carve-out gate. Carve-out rules that rely on the 2026-05-19 draft guidelines are tagged guidance_status: draft.",
+    "rules": [
+      {
+        "rule_id": "HRR-1",
+        "name": "Annex I product-safety high-risk",
+        "trigger": "HR1 = Yes AND HR2 = Yes",
+        "result": "high_risk (Annex I route)",
+        "legal_basis_citation": "Article 6(1); Annex I Section A and B",
+        "applicable_from_date": "2028-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07",
+        "note": "Digital Omnibus deferred Annex I embedded high-risk obligations to 2028-08-02 (from 2027-08-02)."
+      },
+      {
+        "rule_id": "HRR-2",
+        "name": "Annex III use-case high-risk (baseline)",
+        "trigger": "any HR3 area selected (not 'None')",
+        "result": "candidate_high_risk — proceed to carve-out gate",
+        "legal_basis_citation": "Article 6(2); Annex III points 1-8",
+        "applicable_from_date": "2027-12-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07",
+        "note": "Digital Omnibus deferred Annex III stand-alone high-risk obligations to 2027-12-02 (from 2026-08-02)."
+      },
+      {
+        "rule_id": "HRR-3",
+        "name": "Article 6(3) significant-risk carve-out",
+        "trigger": "candidate_high_risk AND (HR4 = Yes OR HR5 = Yes) AND HR6 = No",
+        "result": "not_high_risk (carve-out applies) — sets not_high_risk_documentation_flag = true",
+        "legal_basis_citation": "Article 6(3) subparagraphs (a)-(d)",
+        "applicable_from_date": "2027-12-02 [uncertain]",
+        "guidance_status": "draft [uncertain]",
+        "source_version_date": "2026-07-07",
+        "note": "Boundary of 'narrow procedural task' / 'no material influence' clarified by draft Commission guidelines (2026-05-19), not yet final."
+      },
+      {
+        "rule_id": "HRR-4",
+        "name": "Profiling override",
+        "trigger": "candidate_high_risk AND HR6 = Yes",
+        "result": "high_risk (carve-out unavailable)",
+        "legal_basis_citation": "Article 6(3) final subparagraph",
+        "applicable_from_date": "2027-12-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "HRR-5",
+        "name": "Registration on entering high-risk",
+        "trigger": "result = high_risk (either route)",
+        "result": "registration_required = true (Annex VIII / Article 49); non-public sub-database for law-enforcement, migration and border systems",
+        "legal_basis_citation": "Article 49; Article 71; Annex VIII",
+        "applicable_from_date": "2027-12-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      }
+    ]
+  },
+
+  "Result Object": {
+    "category": "Result Object",
+    "detail_level": "detailed",
+    "description": "Per-system high-risk classification output.",
+    "classification_or_status": "One of: likely_high_risk | possibly_high_risk | needs_review | likely_not_high_risk | not_high_risk_carve_out | not_assessed_excluded. Never 'compliant'.",
+    "confidence_score": "0-100 deterministic. Start 100; subtract 20 if Annex I safety-component status unknown, 20 if the Annex III area selection is 'Not sure', 25 if carve-out answers (HR4/HR5) unknown while a candidate area is selected, 15 if profiling status (HR6) unknown, 10 per contradictory answer; floor 0.",
+    "confidence_label": "high (80-100) | medium (50-79) | low (20-49) | insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic text, e.g. 'This system is used for recruitment screening (Annex III point 4) and profiles candidates, so the Article 6(3) carve-out does not apply and it is likely high-risk. Provider obligations under Articles 8-17 and registration under Article 49 would apply from 2 December 2027.'",
+    "positive_indicators": [
+      "Falls within a listed Annex III use-case area",
+      "Is a safety component of an Annex I product requiring third-party conformity assessment",
+      "Performs profiling of natural persons (blocks the carve-out)"
+    ],
+    "negative_indicators": [
+      "Performs only a narrow procedural or preparatory task with no material influence on decisions (Article 6(3) carve-out)",
+      "Annex I product uses internal self-assessment only, not third-party conformity assessment",
+      "Use case falls outside all eight Annex III areas"
+    ],
+    "key_uncertainties": [
+      "Exact boundary of 'narrow procedural task' and 'materially influencing the outcome' pending final Commission high-risk guidelines (2026-05-19 draft)",
+      "Whether a borderline biometric use is high-risk (Annex III) or already prohibited (Module 6 Article 5)",
+      "Whether the specific Annex I product law requires third-party rather than internal conformity assessment"
+    ],
+    "missing_fields": [
+      "module-1.isSafetyComponent",
+      "module-1.sector",
+      "module-1.useCaseDescription",
+      "module-2.role",
+      "module-6.classification_or_status"
+    ],
+    "recommended_next_questions": [
+      "Which specific Annex I product-safety law applies, and does it mandate a notified-body assessment?",
+      "Does a human make the final decision, and does the AI output materially influence it?",
+      "Does the system build a profile of the individuals it assesses?"
+    ],
+    "role_conditional_obligation": "High-risk duties differ sharply by Module 2 role. Provider: full Articles 8-17 (risk management, data governance, technical documentation, logging, transparency-to-deployers, human oversight, accuracy/robustness/cybersecurity, QMS), conformity assessment + CE marking (Art 43), registration (Art 49). Deployer: Article 26 duties (use per instructions, human oversight, input-data relevance, monitoring, logs) plus Article 27 FRIA where applicable. Importer (Art 23) / Distributor (Art 24): verification duties. Store keyed to Module 2 output; re-evaluate on a Module 9 reclassification.",
+    "reclassification_trigger_flags": {
+      "substantial_modification": "A substantial modification (Article 25) makes the modifier a provider of a high-risk system with full obligations.",
+      "rebranded": "Putting own name/trademark on a high-risk system makes the actor its provider (Article 25(1)(a)).",
+      "purpose_changed_to_high_risk": "Changing intended purpose so the system now falls in Annex III makes the actor a provider (Article 25(1)(c)) — must re-run this module."
+    },
+    "registration_required": "true when result = high_risk. Article 49 / Annex VIII registration in the EU database before placing on market or putting into service. Law-enforcement, migration, asylum and border-control high-risk systems register in a non-public section (Article 49(4)). Also applies to Article 6(3) not-high-risk self-assessments (registration of the carve-out determination).",
+    "standards_conformity_route": "For high-risk systems: presumption of conformity via harmonised standards (Article 40) where available — internal control route (Annex VI) for most Annex III systems; notified-body assessment (Annex VII) required for Annex III point 1 biometrics and for Annex I products already subject to third-party assessment. Note: CEN-CENELEC harmonised standards not expected before Q4 2026 [uncertain], affecting realism of the self-assessment route.",
+    "not_high_risk_documentation_flag": "true when HRR-3 carve-out applies. Article 6(3)/6(4): the provider must document the assessment that the system is NOT high-risk before placing it on the market and register it (Article 49(2)). Prevents treating 'not high-risk' as 'nothing to do'."
+  },
+
+  "UI Pattern": {
+    "category": "UI Pattern",
+    "detail_level": "brief",
+    "summary_cards": ["Total systems classified", "Likely high-risk", "Possibly high-risk", "Not high-risk (carve-out)", "Likely not high-risk", "Needs review"],
+    "results_table": "One row per system: System name, Route (Annex I / Annex III), Matched category, Status, Confidence, Carve-out applied?, Registration required?, Applicable-from date, Key uncertainty, Actions. Status and confidence mandatory.",
+    "filters": ["Status", "Confidence", "Route (Annex I / III)", "Annex III area", "Registration required", "Carve-out applied", "Role (from Module 2)"],
+    "csv_export": "Exports all columns plus legal_basis_citation, guidance_status, applicable_from_date, and standards_conformity_route per system.",
+    "detail_page": "/high-risk/systems/[id] — inventory overview, questionnaire, live result panel with reasoning_summary, positive/negative indicators, key uncertainties, role-conditional obligations preview, registration and conformity-route notes, and per-rule legal citations with guidance_status badges.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice. Results should be reviewed by qualified legal or compliance professionals before regulatory decisions are made.",
+    "cross_module_consistency_warning": "Warn when Module 6 status is needs_review (a prohibited finding would override high-risk), when Module 2 role is uncertain (obligation set cannot be finalised), or when Module 5 exclusion is unresolved. Also flag that all carve-out rules and enforcement dates rest on draft/provisional 2026 guidance and may change before the 2027-12-02 / 2028-08-02 application dates."
+  },
+
+  "uncertain": [
+    "applicable_from_date",
+    "guidance_status",
+    "standards_conformity_route"
+  ]
+}

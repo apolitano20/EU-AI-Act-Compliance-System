@@ -1,0 +1,252 @@
+{
+  "module": "Transparency Obligations",
+  "flowchart_section": "#R4, #R5",
+  "legal_basis": ["Article 50", "Article 27", "Annex III", "Recital 132", "Recital 133", "Recital 134", "Recital 135", "Recital 96"],
+  "depends_on": ["module-2", "module-7"],
+  "description": "Article 50 transparency duties: direct-interaction disclosure (chatbots), synthetic-content marking (machine-readable watermarking), emotion-recognition and biometric-categorisation disclosure, and deepfake / AI-generated-public-interest-text labelling. The Fundamental Rights Impact Assessment (FRIA, Article 27) is surfaced as a DISTINCT sub-section — not bundled into general transparency — because it has its own trigger set: public bodies, private providers of public services, and deployers running Annex III creditworthiness/credit-scoring or life/health-insurance risk assessment.",
+
+  "Questionnaire": {
+    "description": "Plain-English, factual-only questions. Reuse Module 1 (interactsDirectlyWithPeople, generatesContent, outputTypes, systemTypes) and Module 2 (provider vs. deployer role) first; ask only what is missing.",
+    "questions": [
+      {
+        "id": "tr_q1",
+        "question_text": "Does this AI system talk to or interact directly with people (for example a chatbot, virtual assistant, or voice bot)?",
+        "helper_text": "If people interact with it directly, they generally must be told they are dealing with an AI — unless that is already obvious from the context to a reasonably well-informed person.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: interactsDirectlyWithPeople; Module 1: systemTypes includes Chatbot"
+      },
+      {
+        "id": "tr_q2",
+        "question_text": "Does the system generate or manipulate synthetic content — text, images, audio, or video?",
+        "helper_text": "If it produces synthetic content, the output generally must be marked in a machine-readable format as artificially generated or manipulated (for example watermarking or metadata).",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: generatesContent; Module 1: outputTypes includes generated content"
+      },
+      {
+        "id": "tr_q3",
+        "question_text": "Does the system produce image, audio, or video content that resembles real people, objects, places, or events and could falsely appear authentic (a deepfake)?",
+        "helper_text": "Deployers of deepfake-generating systems must disclose that the content has been artificially generated or manipulated. Limited artistic/creative exceptions apply but still require disclosure in an appropriate way.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: generatesContent, outputTypes (image/audio/video)"
+      },
+      {
+        "id": "tr_q4",
+        "question_text": "Is AI-generated or AI-assisted text published to inform the public about matters of public interest (for example news, current affairs, or public information)?",
+        "helper_text": "Such text must be disclosed as artificially generated — UNLESS it has undergone human review or editorial control and a person/organisation holds editorial responsibility for it.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: generatesContent (text); use case / deployment context"
+      },
+      {
+        "id": "tr_q5",
+        "question_text": "Does the system recognise or infer people's emotions, or categorise people based on biometric data (for example facial or voice analysis)?",
+        "helper_text": "Deployers of emotion-recognition or biometric-categorisation systems must inform the people exposed to them. Note some emotion-recognition uses (workplace, education) are prohibited under Article 5 and are handled in the prohibited-practices module.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: systemTypes includes Biometric system; profilesIndividuals"
+      },
+      {
+        "id": "tr_q6",
+        "question_text": "For each transparency trigger above, is your organisation the provider (you build/place the system on the market) or the deployer (you use it under your own authority)?",
+        "helper_text": "Direct-interaction (50(1)) and synthetic-content marking (50(2)) are PROVIDER duties. Deepfake disclosure, public-interest text disclosure, and emotion/biometric disclosure (50(3)-(4)) are DEPLOYER duties. The same system can carry both.",
+        "answer_options": ["Provider", "Deployer", "Both", "Not sure", "Not applicable"],
+        "reused_from": "Module 2: entity role classification"
+      },
+      {
+        "id": "tr_q7",
+        "question_text": "Is your organisation a public body, or a private organisation providing public services (for example healthcare, education, housing, social security, or essential utilities)?",
+        "helper_text": "This is a FRIA trigger. Public authorities and private providers of public services that deploy an Annex III high-risk system generally must complete a Fundamental Rights Impact Assessment before first use.",
+        "answer_options": ["Public body", "Private provider of public services", "Neither", "Not sure", "Not applicable"],
+        "reused_from": "Module 2 / Module 1: organisation type, deployment context"
+      },
+      {
+        "id": "tr_q8",
+        "question_text": "Does your organisation use an AI system to evaluate creditworthiness / credit scoring, or to assess risk and pricing for life or health insurance?",
+        "helper_text": "These two specific high-risk use cases (Annex III points 5(b) and 5(c)) trigger a FRIA even for ordinary private deployers, regardless of whether you provide public services.",
+        "answer_options": ["Yes - creditworthiness/credit scoring", "Yes - life/health insurance risk", "No", "Not sure", "Not applicable"],
+        "reused_from": "Module 1: riskDomainFlags, business function"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "description": "Rules file src/lib/transparency/rules.ts — deterministic, rule-traceable. FRIA rules (FRIA-R*) are kept structurally separate from Article 50 rules (TR-R*) so the FRIA sub-section can be surfaced independently.",
+    "rules": [
+      {
+        "id": "TR-R1",
+        "name": "Direct-interaction disclosure",
+        "condition": "tr_q1 = Yes AND role = Provider AND interaction not obvious to user",
+        "outcome": "Provider must design and inform users that they are interacting with an AI system, unless obvious from context. Flag disclosure-at-point-of-interaction obligation.",
+        "legal_basis_citation": "Article 50(1); Recital 132",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "TR-R2",
+        "name": "Synthetic-content marking",
+        "condition": "tr_q2 = Yes AND role = Provider",
+        "outcome": "Provider must mark outputs (text/image/audio/video) as artificially generated or manipulated in a machine-readable, robust, interoperable format. Legacy systems on the market before 2026-08-02 get a grace period to 2026-12-02.",
+        "legal_basis_citation": "Article 50(2); Recital 133",
+        "applicable_from_date": "2026-08-02",
+        "legacy_grace_until": "2026-12-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "TR-R3",
+        "name": "Emotion-recognition / biometric-categorisation disclosure",
+        "condition": "tr_q5 = Yes AND role = Deployer AND not prohibited under Article 5",
+        "outcome": "Deployer must inform exposed natural persons of the system's operation and process personal data per GDPR. Cross-check the prohibited-practices module for banned workplace/education emotion recognition.",
+        "legal_basis_citation": "Article 50(3); Recital 132",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "TR-R4",
+        "name": "Deepfake disclosure",
+        "condition": "tr_q3 = Yes AND role = Deployer",
+        "outcome": "Deployer must disclose that image/audio/video content has been artificially generated or manipulated. Reduced/adapted disclosure for evidently artistic, creative, satirical or fictional work, but disclosure still required in an appropriate manner.",
+        "legal_basis_citation": "Article 50(4) first subparagraph; Recital 134",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "TR-R5",
+        "name": "AI-generated public-interest text disclosure",
+        "condition": "tr_q4 = Yes AND role = Deployer AND NOT (human editorial review + editorial responsibility)",
+        "outcome": "Deployer must disclose that text published to inform the public on matters of public interest is artificially generated. Exempt where the text underwent human review and a person/organisation holds editorial responsibility.",
+        "legal_basis_citation": "Article 50(4) second subparagraph; Recital 135",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "TR-R6",
+        "name": "Transparency exemption — law enforcement",
+        "condition": "System authorised by law to detect/prevent/investigate criminal offences",
+        "outcome": "Certain Article 50 disclosure duties are relaxed for legally authorised law-enforcement use, subject to safeguards. Flag for legal review rather than auto-clearing.",
+        "legal_basis_citation": "Article 50(1),(2),(4) exemptions",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "FRIA-R1",
+        "name": "FRIA — public body / public-service deployer",
+        "condition": "tr_q7 = Public body OR Private provider of public services, AND system is an Annex III high-risk system deployed by the organisation",
+        "outcome": "Fundamental Rights Impact Assessment required before first use: describe deployer processes, period/frequency of use, categories of natural persons affected, specific risks of harm, human-oversight measures, and mitigation/governance. Notify the market surveillance authority.",
+        "legal_basis_citation": "Article 27(1); Article 27(2)-(3); Recital 96",
+        "applicable_from_date": "2027-12-02",
+        "guidance_status": "draft",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "id": "FRIA-R2",
+        "name": "FRIA — creditworthiness / insurance deployer",
+        "condition": "tr_q8 = Yes (Annex III 5(b) creditworthiness/credit scoring OR 5(c) life/health insurance risk assessment & pricing)",
+        "outcome": "FRIA required even for ordinary private deployers of these two Annex III use cases. Same FRIA content set as FRIA-R1.",
+        "legal_basis_citation": "Article 27(1); Annex III point 5(b), 5(c)",
+        "applicable_from_date": "2027-12-02",
+        "guidance_status": "draft",
+        "source_version_date": "2026-07-07"
+      }
+    ]
+  },
+
+  "Result Object": {
+    "description": "Per-system, per-module transparency + FRIA assessment output.",
+    "classification_or_status": {
+      "values": [
+        "likely subject to Article 50 transparency duties",
+        "possible transparency duties — needs review",
+        "likely subject to FRIA (Article 27)",
+        "possible FRIA — needs review",
+        "transparency duties unlikely to apply",
+        "insufficient information"
+      ],
+      "note": "Separate status is emitted for Article 50 and for FRIA so the two sub-sections surface independently. Uses 'likely/possible/needs review' wording only."
+    },
+    "confidence_score": "0-100 deterministic score. Start at 100; subtract 15 per core 'Not sure' (interacts-with-people, generates-content, biometric, role); subtract 20 if provider/deployer role unknown (drives which duty applies); subtract 20 if organisation type unknown for FRIA; subtract 10 per missing essential field (cap -40); subtract 15 for contradictory answers. Clamp 0-100.",
+    "confidence_label": "high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic generated text, e.g. 'This system likely carries Article 50(1) direct-interaction and 50(2) synthetic-content duties because it is a content-generating chatbot placed on the market by your organisation. A FRIA is possibly required because you are a public-service provider, pending confirmation of high-risk status.'",
+    "positive_indicators": [
+      "System interacts directly with people (chatbot/assistant)",
+      "System generates or manipulates synthetic text/image/audio/video",
+      "Output could be a deepfake resembling real people/events",
+      "AI-generated text published on matters of public interest",
+      "Emotion-recognition or biometric-categorisation capability",
+      "Deployer is a public body / provider of public services",
+      "Use case is creditworthiness or life/health insurance risk"
+    ],
+    "negative_indicators": [
+      "No direct human interaction and no content generation",
+      "Synthetic-content marking handled upstream by the provider (organisation is only a downstream user)",
+      "Interaction with AI is obvious from context",
+      "AI-generated public-interest text under human editorial responsibility",
+      "Not a public body, no public-service provision, and no credit/insurance use"
+    ],
+    "key_uncertainties": [
+      "Whether 'obvious from context' applies, removing the 50(1) disclosure duty.",
+      "Whether the artistic/creative/editorial exceptions to deepfake and public-interest-text disclosure apply.",
+      "Whether the system meets the Annex III high-risk threshold that FRIA depends on — resolved in the high-risk module.",
+      "FRIA enforcement date follows the deferred Annex III high-risk timeline, which the Digital Omnibus is still finalising."
+    ],
+    "missing_fields": [
+      "provider_or_deployer_role",
+      "organisation_type_public_or_public_service",
+      "content_generation_modalities",
+      "annex_iii_high_risk_status",
+      "human_editorial_control_flag"
+    ],
+    "recommended_next_questions": [
+      "Confirm whether your organisation is the provider or the deployer for each transparency trigger.",
+      "Confirm whether AI-generated public-interest text is under human editorial responsibility.",
+      "Confirm whether the deepfake output is for evidently artistic/creative purposes.",
+      "Confirm whether the system is used for creditworthiness or life/health insurance risk assessment."
+    ],
+    "role_conditional_obligation": {
+      "description": "Article 50 splits duties by role; FRIA is a deployer-only duty. Keyed to Module 2 output.",
+      "provider": "Article 50(1) direct-interaction disclosure design; Article 50(2) machine-readable synthetic-content marking. No FRIA.",
+      "deployer": "Article 50(3) emotion/biometric disclosure; Article 50(4) deepfake and public-interest-text disclosure; Article 27 FRIA if a public body/public-service provider or credit/insurance use.",
+      "both": "Provider and deployer duties accumulate on the same system."
+    },
+    "reclassification_trigger_flags": {
+      "substantial_modification": "[uncertain] — a deployer that substantially modifies a system can become a provider (Module 9) and inherit 50(1)/50(2) provider duties.",
+      "rebranded": "[uncertain] — putting own brand on a third-party content generator can shift 50(2) marking duty to the organisation.",
+      "purpose_changed_to_high_risk": "If a purpose change makes the system Annex III high-risk, a previously-inapplicable FRIA may become required."
+    },
+    "registration_required": "Article 50 transparency alone does not trigger Annex VIII registration. FRIA-triggering systems are Annex III high-risk and therefore also carry Article 49/Annex VIII registration (with the non-public variant for law-enforcement/migration/border deployers); the completed FRIA is notified to the market surveillance authority.",
+    "standards_conformity_route": "Not a harmonised-standard/notified-body route. Transparency compliance is supported by the Article 50(7) Code of Practice on marking and labelling AI-generated content (AI Office). [uncertain] — Code of Practice finalisation and adherence status.",
+    "not_high_risk_documentation_flag": "A transparency-only system that is not high-risk still owes the Article 50 disclosures; document that Article 50 was assessed and, where FRIA was considered and found not to apply, record why (organisation type / use case did not match the trigger set) rather than treating 'not high-risk' as 'nothing to do'."
+  },
+
+  "UI Pattern": {
+    "summary_cards": [
+      "Total AI systems in scope",
+      "Likely Article 50 transparency duties",
+      "Deepfake / synthetic-content systems",
+      "Emotion-recognition / biometric-categorisation systems",
+      "Likely FRIA required (Article 27)",
+      "Possible / needs review",
+      "Insufficient information"
+    ],
+    "results_table": {
+      "columns": ["System name", "Role", "Article 50 triggers", "FRIA trigger", "Transparency status", "Confidence", "Key uncertainty", "Applicable from", "Last assessed", "Actions"],
+      "note": "Includes status / confidence / key-uncertainty columns at minimum; FRIA shown as its own column, not merged into the Article 50 trigger column."
+    },
+    "filters": ["Role (provider/deployer)", "Article 50 trigger type", "FRIA trigger", "Confidence label", "Organisation type", "Missing data"],
+    "csv_export": "Export the transparency + FRIA assessment table to CSV.",
+    "detail_page": "/transparency/systems/[id] — system overview, evidence used from Modules 1/2, a dedicated Article 50 result panel AND a separate FRIA result panel, positive/negative indicators, key uncertainties, missing fields, recommended next questions, applicable dates per obligation, link back to inventory.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.",
+    "cross_module_consistency_warning": "FRIA depends on Annex III high-risk status. If the high-risk module has not yet confirmed it, or if Module 2's role classification is uncertain, warn that the FRIA and role-specific transparency outputs should be reviewed before relying on them."
+  },
+
+  "uncertain": [
+    "classification_or_status",
+    "reclassification_trigger_flags",
+    "standards_conformity_route",
+    "applicable_from_date",
+    "guidance_status"
+  ]
+}

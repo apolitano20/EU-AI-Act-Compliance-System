@@ -1,0 +1,173 @@
+{
+  "module_id": "module-5",
+  "module_name": "Exclusions",
+  "flowchart_section": "#R2",
+  "legal_basis": ["Article 2"],
+  "depends_on": ["module-1", "module-3", "module-4"],
+  "description": "Evaluates the Article 2 carve-outs that remove a system from the AI Act's scope: military/defence/national-security use, third-country law-enforcement/judicial cooperation, scientific research & pre-market development, free and open-source release, and personal/non-professional use by a natural person.",
+  "source_version_date": "2026-07-07",
+
+  "Questionnaire": {
+    "questions": [
+      {
+        "question_text": "Is this AI system used exclusively for military, defence, or national-security purposes?",
+        "helper_text": "The carve-out is purpose-based, not sector-based. If a system built for military use is later used (even temporarily) for civilian, humanitarian, or law-enforcement purposes, it re-enters scope.",
+        "answer_options": ["Yes", "No", "Partly / dual use", "Not sure"],
+        "reused_from": "module-1 (use case / sector)"
+      },
+      {
+        "question_text": "Is the system operated by a third-country public authority or an international organisation under an international agreement for law-enforcement or judicial cooperation with the EU or a Member State?",
+        "helper_text": "This narrow exclusion applies only where adequate safeguards for fundamental rights are in place under such cooperation frameworks.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1 (operator type) / module-2 (entity type)"
+      },
+      {
+        "question_text": "Is the system currently only in scientific research, testing, or development, before being placed on the market or put into service?",
+        "helper_text": "Pre-market R&D is excluded. Important exception: testing in real-world conditions is NOT covered by the exclusion and remains in scope.",
+        "answer_options": ["Yes - pre-market R&D only", "No - already placed on market / in service", "Includes real-world testing", "Not sure"],
+        "reused_from": "module-1 (lifecycle stage) / module-3 (AI-system definition gate)"
+      },
+      {
+        "question_text": "Is the AI system released under a free and open-source licence?",
+        "helper_text": "Open-source release is excluded UNLESS the system is high-risk, a prohibited practice, or subject to Article 50 transparency duties. Note: open-source GPAI models still carry certain Article 53 documentation duties unless they present systemic risk.",
+        "answer_options": ["Yes - free and open-source", "No - proprietary/commercial", "Open-source but high-risk/prohibited/transparency-triggering", "Not sure"],
+        "reused_from": "module-1 (licensing / build-or-buy) / module-3"
+      },
+      {
+        "question_text": "Is the system used by a natural person purely in the course of a personal, non-professional activity?",
+        "helper_text": "This excludes deployer obligations for individuals using AI privately (e.g. a hobby project), not organisations or any professional/commercial use.",
+        "answer_options": ["Yes", "No - professional/organisational use", "Not sure"],
+        "reused_from": "module-2 (entity/role: natural person vs organisation)"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "rules": [
+      {
+        "rule_id": "X-01",
+        "condition": "AI system placed on the market, put into service, or used exclusively for military, defence, or national-security purposes (regardless of the type of entity carrying out the activity).",
+        "result": "EXCLUDED — unless the system is used, temporarily or permanently, for other (civilian/humanitarian/law-enforcement) purposes, in which case it re-enters scope.",
+        "legal_basis_citation": "Article 2(3)",
+        "applicable_from_date": "2026-08-02 (applies as a scope carve-out from general application)",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "X-02",
+        "condition": "System used by public authorities of a third country or by international organisations acting within international cooperation/agreements for law-enforcement and judicial cooperation with the EU or Member States, with adequate fundamental-rights safeguards.",
+        "result": "EXCLUDED for that cooperation context.",
+        "legal_basis_citation": "Article 2(4)",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "X-03",
+        "condition": "AI systems or models specifically developed and put into service for the sole purpose of scientific research and development.",
+        "result": "EXCLUDED.",
+        "legal_basis_citation": "Article 2(6)",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "X-04",
+        "condition": "Any research, testing, or development activity regarding AI systems/models prior to their being placed on the market or put into service.",
+        "result": "EXCLUDED — but testing in real-world conditions is expressly NOT covered and remains in scope.",
+        "legal_basis_citation": "Article 2(8)",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "X-05",
+        "condition": "Deployer is a natural person using the AI system in the course of a purely personal, non-professional activity.",
+        "result": "EXCLUDED (deployer obligations do not apply).",
+        "legal_basis_citation": "Article 2(10)",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "X-06",
+        "condition": "AI system released under a free and open-source licence.",
+        "result": "EXCLUDED — UNLESS it is placed on the market/put into service as a high-risk system, is a prohibited practice (Art 5), or is subject to Article 50 transparency obligations. Open-source GPAI models retain certain Article 53 duties unless they present systemic risk.",
+        "legal_basis_citation": "Article 2(12) (with Article 53/54 GPAI open-source nuances)",
+        "applicable_from_date": "2026-08-02 (GPAI-related duties from 2025-08-02)",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      }
+    ]
+  },
+
+  "Result Object": {
+    "classification_or_status": "likely excluded | possibly excluded (partial/conditional) | likely not excluded | needs review",
+    "confidence_score": 85,
+    "confidence_label": "high",
+    "reasoning_summary": "A system is removed from the AI Act's scope only if it fully satisfies one of the Article 2 carve-outs. Each carve-out is narrow and conditional: the military exclusion collapses on dual-use; the R&D exclusion collapses once real-world testing begins or the system is placed on the market; the open-source exclusion collapses for high-risk, prohibited, or transparency-triggering systems and does not fully release open-source GPAI models; and the personal-use exclusion applies only to natural persons acting non-professionally.",
+    "positive_indicators": [
+      "Exclusive military/defence/national-security purpose (Art 2(3))",
+      "Third-country/international law-enforcement cooperation with safeguards (Art 2(4))",
+      "Sole scientific R&D purpose (Art 2(6)) or pre-market development (Art 2(8))",
+      "Free and open-source release that is not high-risk/prohibited/transparency-triggering (Art 2(12))",
+      "Natural person, purely personal non-professional use (Art 2(10))"
+    ],
+    "negative_indicators": [
+      "Dual or repurposed use of a military system (re-enters scope)",
+      "Real-world testing underway, or system already placed on market / in service",
+      "Open-source system that is high-risk, prohibited, or subject to Article 50 transparency",
+      "Professional/organisational use rather than personal use",
+      "Open-source GPAI model (Art 53 documentation duties persist)"
+    ],
+    "key_uncertainties": [
+      "Boundary between excluded pre-market R&D and in-scope real-world testing (Art 2(6)/(8))",
+      "Whether an open-source GPAI model's Article 53 duties survive the open-source carve-out (systemic-risk dependent)",
+      "Scope of the 'national security' carve-out (Art 2(3)) where use is partly civilian — subject to interpretive debate",
+      "'Adequate safeguards' threshold for the third-country law-enforcement exclusion (Art 2(4))"
+    ],
+    "missing_fields": [
+      "use_case_purpose (module-1)",
+      "lifecycle_stage / real_world_testing_flag (module-1)",
+      "licensing_open_source_flag (module-1)",
+      "deployer_natural_person_flag (module-2)",
+      "in_scope_status (module-4)"
+    ],
+    "recommended_next_questions": [
+      "Confirm whether any real-world testing has begun (breaks the R&D exclusion).",
+      "For open-source systems, confirm high-risk / prohibited / transparency status and whether it is a GPAI model.",
+      "For military systems, confirm there is no civilian, humanitarian, or law-enforcement use."
+    ],
+    "role_conditional_obligation": {
+      "note": "Exclusions can be role- and use-specific. The Article 2(10) personal-use carve-out releases only natural-person deployers, not providers; the open-source carve-out affects provider obligations but does not release downstream deployers who use the system in a high-risk or transparency-triggering way.",
+      "provider_open_source": "Released from most provider obligations unless high-risk/prohibited/Art 50; GPAI providers keep Art 53 duties unless systemic risk.",
+      "deployer_natural_person_personal_use": "Excluded from deployer obligations (Art 2(10)).",
+      "deployer_professional": "Not covered by the personal-use exclusion."
+    },
+    "reclassification_trigger_flags": {
+      "substantial_modification": false,
+      "rebranded": false,
+      "purpose_changed_to_high_risk": false,
+      "note": "A purpose change (e.g. military-to-civilian, or personal-to-professional) or repurposing that ends an exclusion is a re-entry event; flag for Module 4 (scope) and Module 9 (reclassification)."
+    },
+    "registration_required": "If an exclusion is lost (e.g. real-world testing or high-risk open-source deployment), Article 49/Annex VIII registration may become required; assessed downstream once the system is confirmed in-scope and high-risk.",
+    "standards_conformity_route": "Not applicable while excluded; becomes relevant only if the system re-enters scope as high-risk (assessed in Module 7/12).",
+    "not_high_risk_documentation_flag": "The open-source carve-out does not remove the Article 6(3) not-high-risk self-assessment documentation duty for providers whose system re-enters scope but is claimed not high-risk."
+  },
+
+  "UI Pattern": {
+    "summary_cards": ["Exclusion matched (which Article 2 carve-out)", "Conditional / partial exclusion warning", "Re-entry trigger flag", "Open-source GPAI residual-duty flag"],
+    "results_table": "Columns: system name, exclusion status, matched carve-out (Art 2(3/4/6/8/10/12)), conditionality warning, confidence, key uncertainty.",
+    "filters": ["exclusion status", "carve-out type", "conditional vs full exclusion", "open-source flag"],
+    "csv_export": true,
+    "detail_page": "Shows each Article 2 carve-out evaluated with its matched rule id and citation, the conditions that could revoke the exclusion, and residual duties (e.g. open-source GPAI Art 53).",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and does not confirm legal compliance. Consult qualified counsel for definitive determinations.",
+    "cross_module_consistency_warning": "Flag if Module 4 (scope) is uncertain, since exclusions only matter for otherwise in-scope systems; flag if Module 3 (AI-system definition) or Module 1 lifecycle data is uncertain, as R&D and open-source carve-outs depend on it."
+  },
+
+  "uncertain": [
+    "applicable_from_date",
+    "registration_required",
+    "standards_conformity_route"
+  ]
+}

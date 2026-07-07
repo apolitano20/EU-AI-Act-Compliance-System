@@ -1,0 +1,178 @@
+{
+  "module_id": "module-14",
+  "module_name": "Remediation Tracker",
+  "flowchart_section": null,
+  "flowchart_section_note": "Practical add-on, not in the Future of Life Institute flowchart.",
+  "legal_basis": [
+    "Article 9-15 (obligations whose gaps are being remediated, inherited via Module 13/12)",
+    "Article 17 (quality management system)",
+    "Article 26 (deployer obligations)",
+    "Article 43, 47-49 (conformity assessment, registration)",
+    "Article 72 (post-market monitoring — recurring)",
+    "Article 73 (serious-incident reporting readiness — event-driven/recurring)",
+    "Annex IV (technical documentation)",
+    "Annex VIII (registration)"
+  ],
+  "depends_on": ["module-13"],
+  "description": "Turns each evidence gap from Module 13 (readiness status of 'partial evidence', 'evidence gap', 'not started' or 'unknown') into a trackable remediation action item with an owner, a due date and a status. It does not re-derive whether an obligation applies (Module 12) or whether evidence exists (Module 13); it only manages the closing of gaps already identified. Critically, it distinguishes one-off tasks (e.g. author the Annex IV technical documentation file) from recurring/lifecycle controls (post-market monitoring under Article 72, serious-incident reporting readiness under Article 73, periodic QMS review under Article 17) that must be re-verified on a cadence and can never be marked permanently 'done'. Due dates are anchored to the per-obligation applicable_from_date carried through from Module 12/13, so the tracker reflects the real (provisional) enforcement timeline rather than an arbitrary date.",
+
+  "Questionnaire": {
+    "description": "One planning question per Module 13 gap row, plus a small set of recurrence-configuration questions for lifecycle obligations. Seeded from Module 13; only shown for obligations whose readiness_status is not 'evidence in place' or 'not applicable'. The tracker asks who owns the fix and when it is due, not whether the obligation applies.",
+    "fields": [
+      {
+        "question_text": "Who is the owner responsible for closing this evidence gap?",
+        "helper_text": "Assign a named person or role (e.g. 'Head of ML', 'DPO', 'Quality Manager'). Unassigned gaps are the most common reason remediation stalls; an owner is required before an item can move past 'open'.",
+        "answer_options": ["<free text: owner name/role>", "Unassigned", "Not sure"],
+        "reused_from": "module-13 obligation row (readiness_status, obligation_id)"
+      },
+      {
+        "question_text": "What is the target due date for closing this gap?",
+        "helper_text": "Default is derived from the obligation's applicable_from_date (from Module 12/13) minus a lead-time buffer for conformity assessment. For high-risk rows this is the provisional 2027-12-02 (Annex III) or 2028-08-02 (Annex I); you can override with your internal deadline.",
+        "answer_options": ["<date>", "Use suggested date from applicable_from_date", "Not sure"],
+        "reused_from": "module-13 → module-12 applicable_from_date"
+      },
+      {
+        "question_text": "Is this a one-off task or a recurring control?",
+        "helper_text": "One-off: produce a document/artifact once (e.g. write the Annex IV file, sign the declaration of conformity). Recurring: a control that must be re-verified on a cadence and is never permanently complete — post-market monitoring (Article 72), incident-reporting readiness (Article 73), periodic QMS/risk-management review (Articles 17, 9).",
+        "answer_options": ["One-off task", "Recurring control", "Not sure"],
+        "reused_from": "module-13 required_evidence_by_obligation (Art 72/73/17/9 flagged recurring)"
+      },
+      {
+        "question_text": "For a recurring control, how often must it be reviewed?",
+        "helper_text": "Sets the recurrence cadence that regenerates the item after it is completed (e.g. monthly post-market monitoring review, quarterly incident-procedure drill, annual QMS audit). Shown only when the item is a recurring control.",
+        "answer_options": ["Monthly", "Quarterly", "Semi-annually", "Annually", "Event-driven (re-arm on trigger)", "Custom", "Not sure"],
+        "reused_from": "answer to 'one-off vs recurring' above"
+      },
+      {
+        "question_text": "What is the current status of this remediation item?",
+        "helper_text": "Lifecycle: Open → In progress → Blocked → Completed (one-off) or → Verified/Re-armed (recurring). 'Completed' on a recurring item schedules the next occurrence rather than closing it.",
+        "answer_options": ["Open", "In progress", "Blocked", "Completed", "Verified", "Deferred", "Not applicable"],
+        "reused_from": "new — tracker state"
+      },
+      {
+        "question_text": "What is the priority of this item?",
+        "helper_text": "Suggested priority is computed from the nearness of the obligation's applicable_from_date and the size of the gap ('not started' > 'partial'). You can override. Prohibited-practice and already-in-force items (e.g. AI literacy, transparency) outrank deferred high-risk items.",
+        "answer_options": ["Critical", "High", "Medium", "Low", "Not sure"],
+        "reused_from": "module-13 readiness_status + module-12 applicable_from_date/guidance_status"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "description": "Rules file (src/lib/remediation/remediationRules.ts). For each Module 13 gap, a remediation item is generated deterministically: a suggested due date from applicable_from_date, a one-off-vs-recurring classification from a static map of obligation_id → recurrence, and a priority from (deadline proximity × gap size × guidance_status). No LLM reasoning. The legal_basis_citation, applicable_from_date and guidance_status are inherited per obligation from Module 12/13 so the item, its urgency and its source are traceable. Recurring items are re-armed on completion rather than closed.",
+    "recurrence_map": {
+      "OBL-ART72-PMM": "recurring (post-market monitoring — continuous, review on cadence)",
+      "OBL-ART73-INCIDENT": "recurring/event-driven (incident-reporting readiness — periodic drill + re-arm on incident)",
+      "OBL-ART17-QMS": "recurring (periodic QMS review/audit)",
+      "OBL-ART9-RMS": "recurring (risk-management is a continuous iterative process across the lifecycle)",
+      "OBL-ART10-DATA": "one-off with review-on-change",
+      "OBL-ART11-TECHDOC": "one-off with keep-current duty",
+      "OBL-ART12-LOGGING": "one-off design + recurring retention checks",
+      "OBL-ART13-TRANSP-DEPLOYER": "one-off with update-on-change",
+      "OBL-ART14-OVERSIGHT": "one-off design + recurring operator training (deployer)",
+      "OBL-ART15-ACCURACY": "one-off with re-test-on-change",
+      "OBL-ART26-DEPLOYER": "one-off setup + recurring monitoring/logging",
+      "OBL-ART43-CONFORMITY": "one-off (re-run on substantial modification)",
+      "OBL-ART49-REGISTER": "one-off with update-on-change",
+      "OBL-ART6-3-NOTHR-DOC": "one-off with review-on-change"
+    },
+    "due_date_logic": "suggested_due_date = obligation.applicable_from_date − lead_time_buffer, where lead_time_buffer is larger for OBL-ART43-CONFORMITY on the notified-body route (standards_conformity_route) because third-party assessment has long lead times. Already-in-force obligations (AI literacy 2025-02-02, GPAI 2025-08-02, transparency 2026-08-02) get an immediate/near-term due date, not the deferred high-risk date.",
+    "priority_logic": "priority = f(deadline_proximity, gap_size, guidance_status). Nearer applicable_from_date → higher; 'not started' > 'partial'; obligations already in force outrank deferred high-risk ones. guidance_status 'draft'/'provisional' items are surfaced but flagged 'timeline may shift' so effort is not mis-prioritised against a date that could move.",
+    "legal_basis_citation": "Inherited per obligation from Module 12/13 (e.g. Article 9 for the risk-management remediation item, Article 72 for the post-market-monitoring recurring item).",
+    "applicable_from_date": "Inherited per obligation from Module 12/13. High-risk items carry the provisional 2027-12-02 (Annex III) / 2028-08-02 (Annex I) dates [uncertain]; in-force items carry their actual dates (AI literacy 2025-02-02, GPAI 2025-08-02, transparency 2026-08-02).",
+    "guidance_status": "Inherited per obligation from Module 12/13 (final / provisional / draft). A remediation item derived from a provisional/draft rule inherits that flag so a user is not told to hit a deadline that is not yet law.",
+    "source_version_date": "2026-07-07",
+    "generated_items_example": [
+      {"item_id": "REM-ART11-TECHDOC", "source_obligation": "OBL-ART11-TECHDOC", "task": "Author and maintain the Annex IV technical documentation file", "recurrence": "one-off + keep-current", "suggested_due_date": "before 2027-12-02 minus buffer [uncertain]", "legal_basis_citation": "Article 11; Annex IV", "applicable_from_date": "2027-12-02 (Annex III) [uncertain]", "guidance_status": "provisional", "priority": "High", "source_version_date": "2026-07-07"},
+      {"item_id": "REM-ART72-PMM", "source_obligation": "OBL-ART72-PMM", "task": "Stand up and run the post-market monitoring plan; review monitoring data on cadence", "recurrence": "recurring (e.g. monthly review)", "suggested_due_date": "plan in place before high-risk applicable date; then continuous", "legal_basis_citation": "Article 72; Recital 166", "applicable_from_date": "2027-12-02 (Annex III) [uncertain]", "guidance_status": "provisional", "priority": "Medium", "source_version_date": "2026-07-07"},
+      {"item_id": "REM-ART73-INCIDENT", "source_obligation": "OBL-ART73-INCIDENT", "task": "Establish serious-incident reporting procedure with owner and deadlines; drill periodically", "recurrence": "recurring/event-driven (re-arm on incident)", "suggested_due_date": "procedure + owner before high-risk applicable date; periodic re-verify", "legal_basis_citation": "Article 73", "applicable_from_date": "2027-12-02 (Annex III) [uncertain]", "guidance_status": "provisional", "priority": "Medium", "source_version_date": "2026-07-07"},
+      {"item_id": "REM-ART4-LITERACY", "source_obligation": "OBL-ART4-LITERACY (via Module 8)", "task": "Deliver AI-literacy measures to staff; refresh on cadence", "recurrence": "recurring (annual refresh)", "suggested_due_date": "already in force — immediate", "legal_basis_citation": "Article 4", "applicable_from_date": "2025-02-02", "guidance_status": "draft (Digital Omnibus may soften to a promotion duty) [uncertain]", "priority": "High", "source_version_date": "2026-07-07"}
+    ]
+  },
+
+  "Result Object": {
+    "description": "Per-system remediation plan: a set of action items rolled up into a system-level remediation progress view, plus a recurring-controls calendar.",
+    "classification_or_status": "Per-item status label: 'open' / 'in progress' / 'blocked' / 'completed' / 'verified' / 'deferred' / 'not applicable'; plus a system-level 'X of Y gaps have an owner and due date, Z closed, N recurring controls active' summary. Factual remediation-progress wording only — never 'compliant'. A closed item means an evidence gap was addressed, not that the system is legally compliant.",
+    "confidence_score": "0-100 deterministic, measuring confidence in the completeness of the remediation plan (not in compliance). Start at 100; subtract 15 per gap with no owner assigned, 15 per gap with no due date, 20 if the parent Module 13 readiness picture is itself low-confidence, 10 per recurring control with no cadence set. Example: all gaps owned and dated, cadences set, Module 13 stable = 90.",
+    "confidence_label": "high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic text, e.g. 'This system has 5 open evidence gaps; 3 have an owner and due date, 2 are unassigned. 2 items are recurring controls (post-market monitoring, incident-reporting readiness) and are tracked on a monthly/periodic cadence. The nearest driving deadline is the provisional 2027-12-02 (Annex III); the technical-documentation item (Art 11) is highest priority. Plan-completeness confidence is medium because 2 gaps lack an owner.'",
+    "positive_indicators": [
+      "Every Module 13 gap has a named owner and a due date",
+      "Due dates are anchored to the obligation's applicable_from_date, not arbitrary",
+      "Recurring controls (Art 72 monitoring, Art 73 incident readiness, Art 17 QMS) are configured with a cadence and re-arm on completion",
+      "In-force obligations (AI literacy, transparency) are prioritised ahead of deferred high-risk items"
+    ],
+    "negative_indicators": [
+      "Open evidence gaps with no owner assigned",
+      "Recurring controls tracked as one-off tasks and marked 'done' permanently",
+      "Due dates set past the (provisional) applicable_from_date with no lead-time buffer for conformity assessment",
+      "Remediation plan generated from a low-confidence Module 13 readiness picture"
+    ],
+    "key_uncertainties": [
+      "Deadlines anchoring due dates are provisional (Digital Omnibus not adopted); an item may be more or less urgent than shown.",
+      "Whether the conformity route is self-assessment or notified-body — the notified-body route needs a much longer lead time, changing a realistic due date.",
+      "Whether AI-literacy remains a firm obligation or is softened by the final Digital Omnibus, affecting the priority of that recurring item.",
+      "Whether a Module 9 reclassification will add provider obligations, generating new gaps and new remediation items after this plan was built."
+    ],
+    "missing_fields": [
+      "Owner and/or due date for one or more gaps",
+      "Recurrence cadence for a recurring control",
+      "module-13 gap set (this module cannot run until the readiness assessment is generated)",
+      "standards_conformity_route (needed to set a realistic conformity-assessment due date)"
+    ],
+    "recommended_next_questions": [
+      "For each unassigned gap, who is the accountable owner?",
+      "For each recurring control, what review cadence will you commit to?",
+      "Does the conformity-assessment item allow enough lead time if a notified body is required?",
+      "Should any item be deferred pending confirmation of the provisional high-risk deadline, or worked now to be safe?"
+    ],
+    "role_conditional_obligation": {
+      "description": "Carried through from Module 12/13 — the remediation plan only contains items for obligations the system's role actually holds; a provider plan is far longer than a distributor plan. If Module 9 reclassifies a deployer/distributor to provider, the plan must be regenerated to add the provider-obligation remediation items.",
+      "note": "Inherited, not recomputed. Owners/due dates already set on shared items are preserved when the plan regenerates."
+    },
+    "reclassification_trigger_flags": {
+      "description": "Inherited from Module 12/13. If set, the remediation plan is stale — new provider obligations create new gaps (Module 13) and therefore new remediation items that this plan does not yet contain.",
+      "substantial_modification": "[uncertain]",
+      "rebranded": "[uncertain]",
+      "purpose_changed_to_high_risk": "[uncertain]"
+    },
+    "registration_required": {
+      "description": "Inherited from Module 12/13; when set, generates a specific remediation item to complete the EU-database registration (or the Article 6(3) self-assessment registration).",
+      "remediation_item": "Complete EU database registration (Annex VIII); register the Article 6(3) not-high-risk assessment where a derogation is claimed",
+      "non_public_variant_law_enforcement_migration_border": "[uncertain]"
+    },
+    "standards_conformity_route": {
+      "description": "Inherited from Module 12/13; determines the lead time and content of the conformity-assessment remediation item — the notified-body route needs a much longer buffer and cannot be closed by internal effort alone.",
+      "route": "harmonised_standards (Annex VI) | notified_body (Annex VII) [uncertain]",
+      "note": "When harmonised standards are not yet published, flag the conformity item as schedule-risk: the due date may be undeliverable regardless of owner effort."
+    },
+    "not_high_risk_documentation_flag": {
+      "description": "Inherited from Module 12/13; when set, the plan includes a remediation item to produce and register the Article 6(3) self-assessment, so 'not high-risk' does not silently produce an empty remediation plan.",
+      "value": "carried through from Module 12/13 OBL-ART6-3-NOTHR-DOC"
+    }
+  },
+
+  "UI Pattern": {
+    "summary_cards": [
+      "Total remediation items", "Open", "In progress", "Blocked", "Completed",
+      "Unassigned (no owner)", "Overdue / due within 30 days", "Recurring controls active", "Overall remediation progress %"
+    ],
+    "results_table": {
+      "description": "One row per remediation item (system x obligation gap).",
+      "columns": ["System name", "Task", "Source obligation", "Legal basis", "Applicable from", "Guidance status", "Owner", "Due date", "Recurrence", "Status", "Priority", "Confidence", "Key uncertainty", "Actions"]
+    },
+    "filters": ["Status", "Owner", "Priority", "Recurrence (one-off/recurring)", "Obligation", "Guidance status (final/provisional/draft)", "Due-date range (overdue/30d/90d)", "System"],
+    "csv_export": "Exports the remediation items with owner, due_date, recurrence, status, source_obligation, legal_basis_citation, applicable_from_date and guidance_status so Module 15's final report can cite them and show the remediation state per obligation.",
+    "detail_page": "Per-system remediation board (Kanban by status) plus a recurring-controls calendar view. Each item shows the source gap, the required artifacts (from Module 13), owner, due date, priority, the legal basis and deadline badge, and — for recurring items — the cadence and next-due date. Completing a recurring item schedules its next occurrence instead of closing it.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.",
+    "cross_module_consistency_warning": "Flag when the plan was generated from a Module 13 readiness picture that is low-confidence or 'needs review', or when a Module 9 reclassification has fired since the plan was built — e.g. 'New provider obligations were triggered after this remediation plan was created; regenerate to capture the additional gaps.'"
+  },
+
+  "uncertain": [
+    "applicable_from_date (high-risk remediation items inherit the provisional 2027-12-02 / 2028-08-02 dates that anchor their due dates)",
+    "guidance_status (high-risk items = provisional; Article 6(3) and AI-literacy items = draft)",
+    "reclassification_trigger_flags (inherited per system from Module 9 via Module 12/13)",
+    "registration_required.non_public_variant_law_enforcement_migration_border",
+    "standards_conformity_route.route (drives whether the conformity item's due date is realistic)"
+  ]
+}

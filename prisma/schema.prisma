@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model AISystem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Step 1 – Basic Information
+  systemName        String
+  shortDescription  String
+  businessFunction  String?
+  businessOwner     String?
+  technicalOwner    String?
+  status            String?
+  countriesUsed     String? // JSON array
+  outputsUsedInEu   String?
+
+  // Step 2 – Use Case
+  users                    String? // JSON array
+  affectedPersons          String? // JSON array
+  deploymentContext        String?
+  outputTypes              String? // JSON array
+  affectsDecisionsAboutPeople String?
+  humanReviewOrOverride    String?
+  impactIfWrong            String?
+  useCaseNotes             String?
+
+  // Step 3 – Technical Profile
+  systemTypes                       String? // JSON array
+  decisionLogicType                 String?
+  learnedParametersUsedInProduction String?
+  underlyingModelOrTool             String?
+  modelProvider                     String?
+  usesGpaiOrLlm                     String?
+  usesRag                           String?
+  canCallToolsOrApis                String?
+  canTakeActions                    String?
+  generatesContent                  String?
+  interactsDirectlyWithPeople       String?
+
+  // Step 4 – Data and People
+  usesPersonalData   String?
+  usesSensitiveData  String?
+  profilesIndividuals String?
+  dataTypes          String? // JSON array
+  dataNotes          String?
+
+  // Step 5 – Build / Vendor / Supply Chain
+  buildType                          String?
+  vendorName                         String?
+  vendorCountry                      String?
+  modelProviderName                  String?
+  modelProviderCountry               String?
+  brandedUnderOrganisationName       String?
+  vendorBrandVisible                 String?
+  modifiedFineTunedRebrandedOrRepurposed String?
+  supplyChainNotes                   String?
+
+  // Step 6 – Risk-Domain Flags
+  riskDomainFlags String? // JSON array
+
+  // Computed
+  completenessScore Int?
+
+  roleAssessment EntityRoleAssessment?
+}
+
+model EntityRoleAssessment {
+  id             String   @id @default(cuid())
+  systemId       String   @unique
+  answers        String // JSON: questionnaire answers keyed by roleRules question key
+  lastAssessedAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  system AISystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+}

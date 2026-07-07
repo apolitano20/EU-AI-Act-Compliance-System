@@ -1,0 +1,168 @@
+{
+  "module_id": "module-4",
+  "module_name": "EU Scope & Applicability",
+  "flowchart_section": "#S Scope",
+  "legal_basis": ["Article 2", "Article 22"],
+  "depends_on": ["module-1", "module-2"],
+  "description": "Determines whether the AI Act applies at all, based on where the provider/deployer is established and where system outputs are used. Extended with an Article 22 question: whether a non-EU provider of a high-risk system / GPAI model must appoint an EU authorised representative before market placement.",
+  "source_version_date": "2026-07-07",
+
+  "Questionnaire": {
+    "questions": [
+      {
+        "question_text": "Where is your organisation legally established or located?",
+        "helper_text": "'Established' means where the entity is registered or has its main place of business. Answer 'Third country' if you are outside the EU/EEA.",
+        "answer_options": ["Established in the EU/EEA", "Established in a third country (outside EU/EEA)", "Not sure"],
+        "reused_from": "module-1 (organisation location) / module-2 (entity establishment)"
+      },
+      {
+        "question_text": "Do you place this AI system on the EU market, or put it into service in the EU?",
+        "helper_text": "'Placing on the market' = first making it available in the Union. 'Putting into service' = supplying it for first use to a deployer or for own use in the Union. For GPAI, this means placing the model on the EU market.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1 (deployment/market fields)"
+      },
+      {
+        "question_text": "Is the output produced by the AI system (predictions, content, recommendations, decisions) used by people or organisations located in the EU?",
+        "helper_text": "This is the extraterritorial trigger: even if you and your system sit entirely outside the EU, using its output inside the EU can bring you into scope.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-1 (countriesUsed / output destination)"
+      },
+      {
+        "question_text": "What is your role for this system?",
+        "helper_text": "Provider, deployer, importer, distributor, or authorised representative. Scope triggers differ by role (a deployer is in scope if established in the EU; a provider is in scope if it places the system on the EU market wherever it sits).",
+        "answer_options": ["Provider", "Deployer", "Importer", "Distributor", "Authorised representative", "Not sure"],
+        "reused_from": "module-2 (role classification)"
+      },
+      {
+        "question_text": "Are you a provider established outside the EU whose high-risk AI system or GPAI model will be made available on the EU market?",
+        "helper_text": "If yes, Article 22 requires you to appoint, by written mandate, an EU-established authorised representative before the high-risk system is placed on the market. GPAI-model providers have a parallel duty (Article 54).",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-2 (role) + module-1 (establishment, product type)"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "rules": [
+      {
+        "rule_id": "S-01",
+        "condition": "Provider places an AI system on the EU market or puts it into service in the Union (or places a GPAI model on the EU market), irrespective of where the provider is established.",
+        "result": "IN SCOPE",
+        "legal_basis_citation": "Article 2(1)(a)",
+        "applicable_from_date": "2026-08-02 (general application); prohibited-practice provisions from 2025-02-02; GPAI provisions from 2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "S-02",
+        "condition": "Deployer of an AI system has its place of establishment or is located within the Union.",
+        "result": "IN SCOPE",
+        "legal_basis_citation": "Article 2(1)(b)",
+        "applicable_from_date": "2026-08-02 (general application)",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "S-03",
+        "condition": "Provider or deployer is established/located in a third country, but the output produced by the AI system is used in the Union.",
+        "result": "IN SCOPE (extraterritorial)",
+        "legal_basis_citation": "Article 2(1)(c)",
+        "applicable_from_date": "2026-08-02 (general application)",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "S-04",
+        "condition": "Provider is established in a third country AND places a high-risk AI system on the EU market.",
+        "result": "MUST appoint an EU-established authorised representative by written mandate BEFORE making the high-risk system available on the Union market.",
+        "legal_basis_citation": "Article 22(1)",
+        "applicable_from_date": "Tied to high-risk obligations: Annex III high-risk deferred to 2027-12-02, Annex I high-risk deferred to 2028-08-02 (per Digital Omnibus timeline split)",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "S-05",
+        "condition": "Provider is established in a third country AND places a GPAI model on the EU market.",
+        "result": "MUST appoint an EU-established authorised representative before placing the GPAI model on the market (parallel to, and independent of, the Article 22 high-risk duty).",
+        "legal_basis_citation": "Article 54",
+        "applicable_from_date": "2025-08-02 (GPAI provisions)",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      },
+      {
+        "rule_id": "S-06",
+        "condition": "None of S-01 through S-03 is satisfied (no EU market placement, no EU deployer, no output used in the Union).",
+        "result": "OUT OF SCOPE (subject to exclusion checks in Module 5 still being moot).",
+        "legal_basis_citation": "Article 2(1) (a contrario)",
+        "applicable_from_date": "n/a",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07"
+      }
+    ]
+  },
+
+  "Result Object": {
+    "classification_or_status": "likely in scope | possibly in scope | likely out of scope | needs review",
+    "confidence_score": 90,
+    "confidence_label": "high",
+    "reasoning_summary": "Scope is established when any one of the three Article 2(1) triggers is met: (a) a provider places the system/GPAI model on the EU market wherever established; (b) a deployer is established or located in the Union; or (c) a third-country provider/deployer whose system output is used in the Union. Where a non-EU provider of a high-risk system (Article 22) or GPAI model (Article 54) is in scope, an EU authorised representative must be appointed before market placement.",
+    "positive_indicators": [
+      "System placed on the EU market or put into service in the Union (Art 2(1)(a))",
+      "Deployer established or located in the EU (Art 2(1)(b))",
+      "System output used in the Union despite third-country establishment (Art 2(1)(c))",
+      "Non-EU provider of high-risk system or GPAI model triggering authorised-representative duty (Art 22 / Art 54)"
+    ],
+    "negative_indicators": [
+      "No EU market placement, no EU deployer, and no output used in the Union",
+      "Activity falls entirely under a Module 5 exclusion (military/national security, third-country law-enforcement cooperation, R&D, personal non-professional use)"
+    ],
+    "key_uncertainties": [
+      "Whether system output is 'used in the Union' can be ambiguous where users are transient or location is unknown",
+      "Timing/independence of the GPAI authorised-representative duty (Art 54) relative to the high-risk one (Art 22) for providers who are both",
+      "Interaction between scope determination and open-source/R&D exclusions handled in Module 5"
+    ],
+    "missing_fields": [
+      "organisation_establishment_country (module-1)",
+      "output_destination / countriesUsed (module-1)",
+      "entity_role (module-2)",
+      "product_type: high_risk_or_gpai (module-1/module-7)"
+    ],
+    "recommended_next_questions": [
+      "Confirm the countries where system output is consumed.",
+      "Confirm whether the system is high-risk or a GPAI model (needed to assess the Article 22 / Article 54 authorised-representative duty).",
+      "If out of scope, re-check after any change that routes output into the Union."
+    ],
+    "role_conditional_obligation": {
+      "provider_non_eu_high_risk": "Appoint EU authorised representative before market placement (Art 22); full provider obligations otherwise.",
+      "provider_non_eu_gpai": "Appoint EU authorised representative before placing GPAI model on market (Art 54).",
+      "deployer_eu": "In scope as deployer; deployer obligations apply per risk tier (assessed downstream).",
+      "importer_distributor": "In scope as importer/distributor with verification duties; must confirm authorised representative exists for non-EU providers.",
+      "note": "Same in-scope system yields different duties by Module 2 role; re-evaluate if a Module 9 reclassification trigger fires."
+    },
+    "reclassification_trigger_flags": {
+      "substantial_modification": false,
+      "rebranded": false,
+      "purpose_changed_to_high_risk": false,
+      "note": "Scope module does not set these; it flags them for Module 9. A reclassification that promotes a non-EU deployer/distributor to provider can newly trigger the Article 22 authorised-representative duty."
+    },
+    "registration_required": "Not determined at scope stage; Article 49/Annex VIII registration is assessed in the high-risk/Obligations modules once in-scope and high-risk status are confirmed.",
+    "standards_conformity_route": "Not applicable at scope stage (determined for high-risk systems in Module 7/12).",
+    "not_high_risk_documentation_flag": "Not applicable at scope stage; the Article 6(3) not-high-risk documentation duty is evaluated in the high-risk classification module for in-scope systems."
+  },
+
+  "UI Pattern": {
+    "summary_cards": ["In-scope trigger met (a/b/c)", "Establishment location", "Output-used-in-Union flag", "Authorised-representative required (Art 22/54)"],
+    "results_table": "Columns: system name, scope status, matched trigger (Art 2(1)(a/b/c)), authorised-rep required, confidence, key uncertainty.",
+    "filters": ["scope status", "entity role", "establishment (EU/third country)", "authorised-rep required"],
+    "csv_export": true,
+    "detail_page": "Shows each Article 2(1) trigger evaluated, the matched rule id and citation, and the Article 22/54 authorised-representative determination with reasoning.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and does not confirm legal compliance. Consult qualified counsel for definitive determinations.",
+    "cross_module_consistency_warning": "Flag if Module 2 (entity role) is uncertain/needs-review, since scope triggers and the authorised-representative duty depend on the role and establishment classification; also flag if a Module 5 exclusion is pending, as it may render an in-scope finding moot."
+  },
+
+  "uncertain": [
+    "applicable_from_date",
+    "standards_conformity_route",
+    "registration_required"
+  ]
+}

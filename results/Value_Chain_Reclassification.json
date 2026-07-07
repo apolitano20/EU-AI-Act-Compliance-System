@@ -1,0 +1,149 @@
+{
+  "module_id": "module-9",
+  "module_name": "Value-Chain Reclassification",
+  "flowchart_section": "Article 25 provider-conversion risk (referenced but not fully modeled in Module 2)",
+  "legal_basis": ["Article 25"],
+  "depends_on": ["module-1", "module-2"],
+  "new": true,
+  "description": "Article 25 reallocates responsibility along the AI value chain. A distributor, importer, deployer, or other third party is reclassified as a 'provider' of a high-risk AI system — inheriting the full Article 16 provider obligation set — in three circumstances: (a) they put their name or trademark on a high-risk system already on the market; (b) they make a substantial modification to a high-risk system already placed on the market/put into service such that it remains high-risk; or (c) they modify the intended purpose of a system (including a GPAI system) not previously classified as high-risk such that it becomes high-risk. Module 2 already collects the raw signal (Article25ProviderConversionRisk flag); this module converts it into an explicit reclassification determination feeding the Obligations Matrix (module-12).",
+
+  "questionnaire": [
+    {
+      "question_text": "Have you placed your own name or trademark on an AI system that was originally provided by someone else?",
+      "helper_text": "'Rebranding' or white-labelling an existing system under your own brand makes you its provider for AI Act purposes, even if you did not build it. Answer Yes if the system is marketed to your users under your name rather than the original developer's.",
+      "answer_options": ["Yes", "No", "Not sure"],
+      "reused_from": "module-2 (Article25ProviderConversionRisk flag)"
+    },
+    {
+      "question_text": "Have you made a substantial modification to a high-risk AI system after it was placed on the market or put into service?",
+      "helper_text": "A 'substantial modification' is a change not foreseen or planned in the system's original conformity assessment that either affects its compliance with the high-risk requirements (Chapter III, Section 2) or changes its intended purpose. A pre-planned, already-assessed change is NOT substantial even if technically significant. Routine retraining within the documented scope generally does not qualify.",
+      "answer_options": ["Yes", "No", "Not sure", "Not applicable (system not high-risk)"],
+      "reused_from": "module-2 (Article25ProviderConversionRisk flag); module-7 (high-risk status)"
+    },
+    {
+      "question_text": "Have you changed the intended purpose of an AI system (including a general-purpose AI system) in a way that turns it into a high-risk system?",
+      "helper_text": "If a system that was not high-risk is repurposed by you for a use listed in Annex III (or an Annex I safety-component use) so that it now qualifies as high-risk, you become its provider. Example: taking a general-purpose model and deploying it to score creditworthiness or filter job applicants.",
+      "answer_options": ["Yes", "No", "Not sure"],
+      "reused_from": "module-2 (Article25ProviderConversionRisk flag); module-7 (high-risk use-case mapping)"
+    },
+    {
+      "question_text": "What is your current role for this system before any reclassification?",
+      "helper_text": "Reclassification only promotes non-provider actors. Only deployers, distributors, importers, or other third parties can be converted into providers under Article 25. If you are already the original provider, this module does not apply.",
+      "answer_options": ["Deployer", "Distributor", "Importer", "Other third party", "Already the provider", "Not sure"],
+      "reused_from": "module-2 (entity-type role classification)"
+    }
+  ],
+
+  "deterministic_rules": [
+    {
+      "rule_id": "VCR-1-rebrand",
+      "rule_logic": "IF role IN {deployer, distributor, importer, third_party} AND put_own_name_or_trademark == true AND system is high-risk THEN reclassify to provider (Article 25(1)(a)). Set reclassification_trigger_flags.rebranded = true.",
+      "legal_basis_citation": "Article 25(1)(a)",
+      "applicable_from_date": "2026-08-02 (high-risk obligation stream; note Annex III enforcement deferred to 2027-12-02 and Annex I to 2028-08-02 under the Digital Omnibus timeline split)",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "VCR-2-substantial-modification",
+      "rule_logic": "IF role IN {deployer, distributor, importer, third_party} AND substantial_modification == true AND system remains high-risk after the change THEN reclassify to provider (Article 25(1)(b)). Apply the two-prong test from Article 3(23): change unforeseen in original conformity assessment AND (affects Chapter III Section 2 compliance OR alters assessed intended purpose). Set reclassification_trigger_flags.substantial_modification = true.",
+      "legal_basis_citation": "Article 25(1)(b); Article 3(23) (definition of substantial modification)",
+      "applicable_from_date": "2026-08-02 (see Annex I/III deferral note in VCR-1)",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "VCR-3-purpose-change-to-high-risk",
+      "rule_logic": "IF role IN {deployer, distributor, importer, third_party} AND intended_purpose_changed == true AND resulting system is now high-risk (module-7 re-evaluation returns high-risk) THEN reclassify to provider (Article 25(1)(c)). Applies even to GPAI systems repurposed into a high-risk use. Set reclassification_trigger_flags.purpose_changed_to_high_risk = true.",
+      "legal_basis_citation": "Article 25(1)(c)",
+      "applicable_from_date": "2026-08-02 (see Annex I/III deferral note in VCR-1)",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "VCR-4-original-provider-cooperation",
+      "rule_logic": "WHEN any of VCR-1/2/3 fires, the original provider ceases to be the provider of that specific system, BUT remains bound by Article 25(2)-(3) cooperation duties: provide the new provider with technical documentation/information and reasonable access needed to fulfil obligations. Emit an informational obligation row for the original provider even after liability shifts.",
+      "legal_basis_citation": "Article 25(2), Article 25(3)",
+      "applicable_from_date": "2026-08-02",
+      "guidance_status": "final",
+      "source_version_date": "2026-07-07"
+    },
+    {
+      "rule_id": "VCR-5-draft-high-risk-guidelines-caveat",
+      "rule_logic": "The precise boundary of 'substantial modification' and of 'becomes high-risk' depends in part on the Commission's draft high-risk classification guidelines (published 2026-05-19, consultation closed 2026-06-23), which are not yet final. Any borderline reclassification determination that relies on those guidelines must carry guidance_status: draft and be surfaced as needs-review rather than confirmed.",
+      "legal_basis_citation": "Article 6, Annex III (interpreted via draft Commission high-risk classification guidelines)",
+      "applicable_from_date": "n/a (interpretive guidance)",
+      "guidance_status": "draft",
+      "source_version_date": "2026-07-07"
+    }
+  ],
+
+  "result_object": {
+    "classification_or_status": "Provider reclassification likely triggered — full provider obligation set now applies (needs review where reliant on draft high-risk guidelines)",
+    "confidence_score": 75,
+    "confidence_label": "medium",
+    "reasoning_summary": "Reclassification under Article 25 is deterministic once a trigger is confirmed: rebranding, substantial modification of a high-risk system, or a purpose change that makes a system high-risk each convert a deployer/distributor/importer into a provider carrying Article 16 obligations. Confidence is medium rather than high because the operative predicates depend on judgement-laden concepts ('substantial modification', 'becomes high-risk') whose boundaries partly rest on not-yet-final Commission guidelines, and because the underlying high-risk status (module-7) must itself be settled before triggers (b) and (c) can be confirmed.",
+    "positive_indicators": [
+      "Organisation is a non-provider actor (deployer/distributor/importer/third party) per module-2 — eligible for conversion",
+      "Module 2 Article25ProviderConversionRisk flag is set",
+      "At least one trigger answered Yes (rebrand / substantial modification / purpose change to high-risk)",
+      "System confirmed high-risk in module-7 (for triggers (a) and (b))"
+    ],
+    "negative_indicators": [
+      "Organisation is already the original provider (Article 25 promotion not applicable)",
+      "System is not high-risk and no purpose change makes it high-risk (triggers (a),(b) require high-risk; trigger (c) requires the change to produce high-risk)",
+      "Change was foreseen and covered by the original conformity assessment (not a substantial modification)",
+      "Rebranding/modification confined to a non-high-risk system with no purpose change"
+    ],
+    "key_uncertainties": [
+      "Whether a given modification meets the Article 3(23) 'substantial modification' threshold",
+      "Whether a repurposed system 'becomes high-risk' — depends on module-7 and draft Commission high-risk guidelines",
+      "Scope of the original provider's residual cooperation duty after liability shifts"
+    ],
+    "missing_fields": [
+      "module-7 high-risk classification outcome (required to confirm triggers (a) and (b), and to evaluate trigger (c))",
+      "detail of the modification/purpose change (not captured in modules 1-3; only signalled by the module-2 flag)"
+    ],
+    "recommended_next_questions": [
+      "Was the change to the system documented and covered by the original conformity assessment?",
+      "For a repurposed system, does the new use fall under an Annex III category or an Annex I safety-component use?",
+      "Has the original provider agreed in writing to supply the technical information you need to meet provider obligations?"
+    ],
+    "role_conditional_obligation": {
+      "deployer": "On any Article 25 trigger, deployer is promoted to provider and must satisfy the full Article 16 provider obligation set (risk management, data governance, technical documentation, logging, transparency to deployers, human oversight, accuracy/robustness/cybersecurity, QMS, conformity assessment, registration).",
+      "distributor": "Same promotion to provider on a rebrand or substantial modification of a high-risk system.",
+      "importer": "Same promotion to provider on a rebrand or substantial modification of a high-risk system.",
+      "provider": "Original provider is released as provider of the specific reclassified system but retains Article 25(2)-(3) cooperation/information-sharing duties.",
+      "authorised_representative": "Not a conversion target; obligations remain tied to whichever party holds provider status."
+    },
+    "reclassification_trigger_flags": {
+      "substantial_modification": false,
+      "rebranded": false,
+      "purpose_changed_to_high_risk": false,
+      "note": "This module is the authoritative writer of these flags; boolean values above are defaults to be overwritten by the fired VCR rules. Any true value promotes the actor to provider and re-invokes the Obligations Matrix (module-12) under the provider role."
+    },
+    "registration_required": "conditional — IF reclassification confirms provider status of a high-risk system THEN the new provider inherits the Article 49 / Annex VIII EU-database registration duty (non-public variant for law-enforcement/migration/border systems). Flag drives an Obligations Matrix action item.",
+    "standards_conformity_route": "conditional — a reclassified provider of a high-risk system must complete conformity assessment; presumption-of-conformity via harmonised standards applies where relevant standards exist, otherwise notified-body assessment (Annex I Section A products) or internal control (most Annex III use cases) per Article 43.",
+    "not_high_risk_documentation_flag": "conditional — where a purpose change is assessed and the result is NOT high-risk (trigger (c) not met), the acting provider should retain Article 6(3) not-high-risk self-assessment documentation and register it, so 'no reclassification' is not treated as 'nothing to document'."
+  },
+
+  "ui_pattern": {
+    "summary_cards": [
+      "Reclassification triggered? (Yes/No/Needs review)",
+      "New role: Provider (if any trigger fired)",
+      "Trigger(s): rebrand / substantial modification / purpose change"
+    ],
+    "results_table": "Columns: System | Original role | Trigger(s) fired | New role | Registration required | Status | Confidence | Key uncertainty",
+    "filters": ["original_role", "trigger_type", "confidence_label", "guidance_status", "registration_required"],
+    "csv_export": "Export per-system reclassification determination with the three trigger flags, resulting role, legal_basis_citation, and registration_required for module-12/module-15 aggregation.",
+    "detail_page": "Shows each trigger question and answer, the fired VCR rules with Article 25 citations, the promoted role_conditional_obligation set, the original-provider cooperation duty, and a needs-review banner where the determination rests on draft high-risk guidelines.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and does not guarantee compliance with the EU AI Act. Confirm obligations with qualified counsel.",
+    "cross_module_consistency_warning": "If module-2 role is uncertain or module-7 high-risk status is 'needs review', warn that the reclassification determination inherits that uncertainty — triggers (a)/(b) require confirmed high-risk status and trigger (c) requires a confirmed high-risk outcome after the purpose change. Also flag when the determination depends on the not-yet-final Commission high-risk classification guidelines (guidance_status: draft)."
+  },
+
+  "uncertain": [
+    "reclassification_trigger_flags (default booleans, set at runtime by the fired VCR rules)",
+    "standards_conformity_route (depends on module-7 Annex I vs Annex III outcome and availability of harmonised standards)",
+    "not_high_risk_documentation_flag (conditional on the purpose-change assessment outcome)",
+    "guidance_status (VCR-5 boundary determinations depend on the not-yet-final Commission high-risk classification guidelines)"
+  ]
+}

@@ -1,0 +1,357 @@
+{
+  "module_id": "module-12",
+  "module_name": "Obligations Matrix",
+  "flowchart_section": "Understanding your obligations",
+  "legal_basis": [
+    "Article 9-15", "Article 17", "Article 22-24", "Article 26", "Article 43",
+    "Article 47-49", "Article 72-73", "Recital 47", "Recital 166"
+  ],
+  "depends_on": ["module-2", "module-4", "module-6", "module-7", "module-8", "module-9", "module-10", "module-11"],
+  "description": "Aggregates entity role (M2), AI-system-definition gate (M3), EU scope (M4), prohibited (M6), high-risk (M7), AI literacy (M8), value-chain reclassification (M9), GPAI (M10) and transparency (M11) status into a consolidated per-system obligations checklist. Every applicable article is decomposed into a concrete obligation row (risk-management, data governance, technical documentation, logging, transparency-to-deployers, human oversight, accuracy/robustness/cybersecurity, QMS, EU database registration incl. the Art 6(3) not-high-risk documentation duty, conformity assessment + CE marking, post-market monitoring and serious-incident reporting) rather than left as an article-level reference. No LLM reasoning: obligation rows are switched on/off by deterministic upstream flags.",
+
+  "Questionnaire": {
+    "description": "Reuse M2-M11 outputs first; ask only what upstream modules could not settle. Options are Yes / No / Not sure / Not applicable unless noted.",
+    "fields": [
+      {
+        "question_text": "Should this system's obligations be assessed for a specific entity role, or for every role your organisation holds?",
+        "helper_text": "The same system produces different duties depending on whether you are the provider, deployer, importer, distributor or authorised representative. Module 2 already inferred your role(s); this only confirms which role the matrix should be generated for.",
+        "answer_options": ["Provider", "Deployer", "Importer", "Distributor", "Authorised representative", "All roles held", "Not sure"],
+        "reused_from": "module-2 (likelyRoles / possibleRoles)"
+      },
+      {
+        "question_text": "Has the system, its intended purpose, or its branding changed since it was first placed on the market or put into service?",
+        "helper_text": "Substantial modification, re-branding, or a purpose change that makes it high-risk can convert a deployer/distributor into a provider (Article 25) and swap the obligation set. Module 9 already screens for this.",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-9 (reclassification determination); module-2 (Article25ProviderConversionRisk flag)"
+      },
+      {
+        "question_text": "For a system your upstream assessment did not classify as high-risk, has the provider documented the 'no significant risk' self-assessment?",
+        "helper_text": "Article 6(3) lets a provider treat an Annex III system as not-high-risk, but only if it documents that assessment and (per Article 49) registers it. 'Not high-risk' is not the same as 'nothing to do'.",
+        "answer_options": ["Yes, documented", "No", "Not sure", "Not applicable (system is high-risk)"],
+        "reused_from": "module-7 (Article 6(3) derogation determination)"
+      },
+      {
+        "question_text": "Is your organisation established outside the EU while placing this system on the EU market or putting it into service in the EU?",
+        "helper_text": "A non-EU provider of a high-risk system or GPAI model must appoint an EU authorised representative before market placement (Article 22 / Article 54 for GPAI).",
+        "answer_options": ["Yes", "No", "Not sure", "Not applicable"],
+        "reused_from": "module-4 (scope / establishment); module-2 (non-EU supply chain section)"
+      },
+      {
+        "question_text": "For a high-risk system, do published harmonised standards cover its intended purpose, or will a notified body be involved in conformity assessment?",
+        "helper_text": "If harmonised standards exist and are applied, the provider can self-assess under the presumption-of-conformity route (Annex VI). Biometric and some other Annex III cases, or the absence of standards, may require a notified body (Annex VII).",
+        "answer_options": ["Harmonised standards apply", "Notified body required", "No standards published yet", "Not sure", "Not applicable"],
+        "reused_from": "module-7 (Annex I vs Annex III high-risk category)"
+      }
+    ]
+  },
+
+  "Deterministic Rules": {
+    "description": "One rule per obligation row (src/lib/obligations/obligationRules.ts). A row is emitted only when its trigger evaluates true against upstream module flags; no LLM reasoning. Each row carries its own legal_basis_citation, applicable_from_date, guidance_status and source_version_date so Module 15's report can cite the source and flag draft-derived timing.",
+    "aggregation_logic": "row.emitted = trigger(upstreamFlags) === true. Role determines which duty-holder column is populated (provider/deployer/importer/distributor/auth-rep). A Module 9 reclassification flag re-runs the provider trigger set against a deployer/distributor. Prohibited (M6) short-circuits the matrix to a single 'must not place on market' row. Out-of-scope (M4) or 'likely not an AI system' (M3) suppresses obligation rows and raises a cross-module consistency warning instead.",
+    "legal_basis_citation": "Per-row Article/Annex/Recital reference; see obligation_rows[].legal_basis_citation.",
+    "applicable_from_date": "Per-row enforcement date; see obligation_rows[].applicable_from_date. Timeline is split (Digital Omnibus, provisional).",
+    "guidance_status": "Per-row; final for enacted articles, provisional where the enforcement date rests on the not-yet-adopted Digital Omnibus, draft where the trigger depends on the 2026-05-19 high-risk classification guidelines.",
+    "source_version_date": "2026-07-07",
+    "obligation_rows": [
+      {
+        "obligation_id": "OBL-ART9-RMS",
+        "obligation_name": "Risk-management system",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk (Annex I or Annex III) AND not suppressed by prohibited/out-of-scope",
+        "legal_basis_citation": "Article 9; Recital 47",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Obligation text is final law; only the enforcement date is provisional pending the Digital Omnibus deferral. Continuous, iterative process across the lifecycle."
+      },
+      {
+        "obligation_id": "OBL-ART10-DATA",
+        "obligation_name": "Data and data governance",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 10",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Training/validation/testing data quality, relevance, bias examination and provenance."
+      },
+      {
+        "obligation_id": "OBL-ART11-TECHDOC",
+        "obligation_name": "Technical documentation (Annex IV)",
+        "obligation_type": "one_off_then_maintained",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 11; Annex IV",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Must exist before market placement and be kept up to date."
+      },
+      {
+        "obligation_id": "OBL-ART12-LOGGING",
+        "obligation_name": "Record-keeping / automatic logging",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 12",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Technical capability for automatic event logging over the system's lifetime."
+      },
+      {
+        "obligation_id": "OBL-ART13-TRANSP-DEPLOYER",
+        "obligation_name": "Transparency and instructions for use to deployers",
+        "obligation_type": "one_off_then_maintained",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 13",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Distinct from Article 50 end-user transparency (Module 11); this is provider-to-deployer instructions for use."
+      },
+      {
+        "obligation_id": "OBL-ART14-OVERSIGHT",
+        "obligation_name": "Human oversight (design measures)",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 14",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Provider designs oversight; deployer implements it operationally under Article 26."
+      },
+      {
+        "obligation_id": "OBL-ART15-ACCURACY",
+        "obligation_name": "Accuracy, robustness and cybersecurity",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 15",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Declared accuracy metrics stated in instructions for use; resilience to errors and adversarial manipulation."
+      },
+      {
+        "obligation_id": "OBL-ART17-QMS",
+        "obligation_name": "Quality management system",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 17",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Organisation-wide documented QMS covering the other Article 9-15 duties."
+      },
+      {
+        "obligation_id": "OBL-ART26-DEPLOYER",
+        "obligation_name": "Deployer obligations for high-risk systems",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Deployer"],
+        "applies_when": "module-2 role = Deployer AND module-7 classification = high-risk",
+        "legal_basis_citation": "Article 26",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Use per instructions, assign competent human oversight, monitor operation, keep logs, inform affected workers; FRIA where Article 27 applies (Module 11)."
+      },
+      {
+        "obligation_id": "OBL-ART22-AUTHREP",
+        "obligation_name": "Appointment of EU authorised representative (non-EU provider)",
+        "obligation_type": "one_off",
+        "duty_holder_roles": ["Provider", "Authorised representative"],
+        "applies_when": "module-4 provider established outside EU AND (module-7 = high-risk OR module-10 = GPAI model placed on EU market)",
+        "legal_basis_citation": "Article 22 (high-risk); Article 54 (GPAI); Article 23 importer / Article 24 distributor duties are the reciprocal supply-chain checks",
+        "applicable_from_date": "GPAI: 2025-08-02; high-risk Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Written mandate must be in place before market placement. Importer (Art 23) and distributor (Art 24) verification duties are surfaced as sibling rows when Module 2 assigns those roles."
+      },
+      {
+        "obligation_id": "OBL-ART43-CONFORMITY",
+        "obligation_name": "Conformity assessment, EU declaration of conformity and CE marking",
+        "obligation_type": "one_off_then_on_substantial_change",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 43 (conformity assessment route); Article 47 (EU declaration of conformity); Article 48 (CE marking)",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Route depends on standards_conformity_route: Annex VI internal control (presumption of conformity via harmonised standards) vs Annex VII notified-body assessment. Re-assessment triggered by substantial modification (links to Module 9)."
+      },
+      {
+        "obligation_id": "OBL-ART49-REGISTER",
+        "obligation_name": "EU database registration",
+        "obligation_type": "one_off_then_maintained",
+        "duty_holder_roles": ["Provider", "Deployer (public authority)"],
+        "applies_when": "module-7 classification = high-risk (Annex III) OR Article 6(3) not-high-risk derogation claimed",
+        "legal_basis_citation": "Article 49; Annex VIII",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Non-public registration variant applies to law-enforcement, migration, asylum and border-control systems (Article 49(4)). Public-authority deployers register their use per Article 49(3)."
+      },
+      {
+        "obligation_id": "OBL-ART6-3-NOTHR-DOC",
+        "obligation_name": "Article 6(3) not-high-risk self-assessment documentation and registration",
+        "obligation_type": "one_off_then_maintained",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 = Annex III use-case matched BUT provider claims the Article 6(3) 'no significant risk' derogation",
+        "legal_basis_citation": "Article 6(3); Article 6(4); Article 49 (registration of the assessment)",
+        "applicable_from_date": "2027-12-02 [uncertain]",
+        "guidance_status": "draft",
+        "source_version_date": "2026-07-07",
+        "note": "Prevents treating 'not high-risk' as 'nothing to do'. Boundaries depend on the 2026-05-19 draft high-risk classification guidelines (consultation closed 2026-06-23), hence guidance_status: draft."
+      },
+      {
+        "obligation_id": "OBL-ART72-PMM",
+        "obligation_name": "Post-market monitoring",
+        "obligation_type": "recurring_lifecycle",
+        "duty_holder_roles": ["Provider"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 72; Recital 166",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Documented post-market monitoring plan; ongoing, not a one-off task."
+      },
+      {
+        "obligation_id": "OBL-ART73-INCIDENT",
+        "obligation_name": "Serious-incident reporting",
+        "obligation_type": "recurring_event_driven",
+        "duty_holder_roles": ["Provider", "Deployer (reporting via provider)"],
+        "applies_when": "module-7 classification = high-risk",
+        "legal_basis_citation": "Article 73",
+        "applicable_from_date": "Annex III: 2027-12-02 [uncertain]; Annex I: 2028-08-02 [uncertain]",
+        "guidance_status": "provisional",
+        "source_version_date": "2026-07-07",
+        "note": "Reporting to market surveillance authority within statutory deadlines after becoming aware of a serious incident; readiness (procedure + owner) is the assessable state, not a one-time deliverable."
+      },
+      {
+        "obligation_id": "OBL-ART50-TRANSP-AGG",
+        "obligation_name": "Article 50 transparency (aggregated pointer to Module 11)",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider", "Deployer"],
+        "applies_when": "module-11 flags any Article 50 trigger (direct interaction, synthetic content, deepfake, emotion recognition / biometric categorisation)",
+        "legal_basis_citation": "Article 50; Article 27 (FRIA sub-trigger)",
+        "applicable_from_date": "2026-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07",
+        "note": "Row aggregates the Module 11 determination; timeline unchanged by the Digital Omnibus."
+      },
+      {
+        "obligation_id": "OBL-GPAI-AGG",
+        "obligation_name": "GPAI provider obligations (aggregated pointer to Module 10)",
+        "obligation_type": "lifecycle_recurring",
+        "duty_holder_roles": ["Provider (GPAI model)"],
+        "applies_when": "module-10 = GPAI model provider (with systemic-risk sub-flag where designated)",
+        "legal_basis_citation": "Article 53 (all GPAI); Article 55 (systemic-risk GPAI)",
+        "applicable_from_date": "2025-08-02",
+        "guidance_status": "final",
+        "source_version_date": "2026-07-07",
+        "note": "Systemic-risk designation is not purely the 10^25 FLOP threshold; the Commission can also designate on capability/user-base/autonomy grounds. Surface as an uncertainty, not a hard rule."
+      }
+    ]
+  },
+
+  "Result Object": {
+    "description": "Per-system, per-role consolidated obligations output.",
+    "classification_or_status": "Status label per obligation row using 'likely applies' / 'possibly applies' / 'needs review' / 'does not appear to apply' wording, plus an overall 'obligations identified: N (likely) / M (needs review)' summary. Never 'compliant' or 'legally confirmed'.",
+    "confidence_score": "0-100 deterministic. Start at 100; subtract 20 if the upstream high-risk classification is 'needs review', 15 per unresolved role ambiguity from Module 2, 15 if a Module 9 reclassification flag is unresolved, 10 per 'Not sure' answer to a matrix-specific question, 20 if scope (Module 4) is unresolved. Example: high-risk confirmed + single clear provider role + no reclassification flag = 92.",
+    "confidence_label": "high (80-100) / medium (50-79) / low (20-49) / insufficient_information (0-19)",
+    "reasoning_summary": "Deterministic text, e.g. 'As the likely provider of a system your assessment treats as high-risk under Annex III, the following provider obligations appear to apply: risk-management (Art 9), data governance (Art 10) ... Enforcement dates shown are provisional pending the Digital Omnibus. Review the reclassification flag before relying on the deployer-only column.'",
+    "positive_indicators": [
+      "Upstream high-risk classification is confirmed with high confidence",
+      "Entity role resolved to a single duty-holder (e.g. provider)",
+      "System is in EU scope and passed the AI-system-definition gate",
+      "No Module 9 reclassification flag outstanding"
+    ],
+    "negative_indicators": [
+      "Prohibited-practice flag from Module 6 (matrix collapses to a single 'must not place on market' row)",
+      "Out-of-scope (Module 4) or 'likely not an AI system' (Module 3) — obligation rows suppressed",
+      "System classified not-high-risk with no Article 6(3) derogation claimed (only baseline/transparency/literacy duties remain)"
+    ],
+    "key_uncertainties": [
+      "High-risk enforcement dates rest on the unadopted Digital Omnibus (provisional agreement 2026-05-07); shown dates may move.",
+      "High-risk classification boundaries depend on the 2026-05-19 draft Commission guidelines (consultation closed 2026-06-23), still not final.",
+      "Whether a systemic-risk GPAI designation applies (Commission can designate beyond the 10^25 FLOP threshold).",
+      "Whether AI literacy (Art 4) remains a firm organisational obligation or is softened by the Digital Omnibus."
+    ],
+    "missing_fields": [
+      "module-7 high-risk classification (blocks the whole provider obligation set)",
+      "module-2 resolved role (determines which duty-holder column is populated)",
+      "module-4 scope determination",
+      "module-9 reclassification determination",
+      "standards_conformity_route input (blocks the conformity-assessment row detail)"
+    ],
+    "recommended_next_questions": [
+      "Confirm the entity role the matrix should be generated for.",
+      "Confirm whether harmonised standards cover the system or a notified body is required.",
+      "Confirm whether an Article 6(3) not-high-risk self-assessment has been documented and registered.",
+      "Confirm whether the provider is established outside the EU (authorised-representative trigger)."
+    ],
+    "role_conditional_obligation": {
+      "description": "Obligation set keyed to the Module 2 role output; re-evaluated when a Module 9 reclassification trigger fires.",
+      "provider": ["Art 9", "Art 10", "Art 11", "Art 12", "Art 13", "Art 14", "Art 15", "Art 17", "Art 43", "Art 47", "Art 48", "Art 49", "Art 72", "Art 73"],
+      "deployer": ["Art 26", "Art 27 (FRIA where triggered)", "Art 50 (relevant transparency)", "Art 49(3) registration where public authority"],
+      "importer": ["Art 23 (verify conformity, documentation, CE marking before placing on market)"],
+      "distributor": ["Art 24 (verify CE marking and accompanying documentation)"],
+      "authorised_representative": ["Art 22 (keep documentation, cooperate with authorities on behalf of non-EU provider)"]
+    },
+    "reclassification_trigger_flags": {
+      "description": "Boolean set from Module 9 / Module 2 that can promote a deployer/distributor to provider status and swap the obligation set.",
+      "substantial_modification": "[uncertain]",
+      "rebranded": "[uncertain]",
+      "purpose_changed_to_high_risk": "[uncertain]"
+    },
+    "registration_required": {
+      "description": "Article 49 / Annex VIII flag driving an Obligations Matrix action item.",
+      "high_risk_annex_iii": true,
+      "article_6_3_not_high_risk_assessment": true,
+      "non_public_variant_law_enforcement_migration_border": "[uncertain]"
+    },
+    "standards_conformity_route": {
+      "description": "For high-risk systems, whether the presumption-of-conformity route via harmonised standards applies vs notified-body assessment; feeds the conformity-assessment obligation and remediation-timeline realism.",
+      "route": "harmonised_standards (Annex VI) | notified_body (Annex VII) [uncertain]",
+      "note": "Many harmonised standards under the AI Act are not yet published; absence of an applicable standard can force the notified-body route or delay self-assessment."
+    },
+    "not_high_risk_documentation_flag": {
+      "description": "Article 6(3) carve-out still requires the provider to document the 'no significant risk' self-assessment and register it (Article 49). Prevents treating 'not high-risk' as 'nothing to do'.",
+      "value": "set when Module 7 matched an Annex III use case but the Article 6(3) derogation is claimed"
+    }
+  },
+
+  "UI Pattern": {
+    "summary_cards": [
+      "Total systems assessed", "Systems with high-risk obligations", "Systems with GPAI obligations",
+      "Systems with transparency-only obligations", "Prohibited (blocked)", "Out-of-scope / gate not met",
+      "Obligations needing review", "Non-EU providers needing authorised representative"
+    ],
+    "results_table": {
+      "description": "One row per system (expandable to per-obligation rows).",
+      "columns": ["System name", "Role(s)", "Status", "Obligation count (likely / needs review)", "Registration required", "Conformity route", "Earliest applicable date", "Confidence", "Key uncertainty", "Last assessed", "Actions"]
+    },
+    "filters": ["Role", "Obligation status", "Registration required", "Conformity route", "Guidance status (final/provisional/draft)", "Confidence", "Applicable-from date range"],
+    "csv_export": "Exports the flattened per-obligation rows (system x obligation) with legal_basis_citation, applicable_from_date and guidance_status columns so downstream reporting can cite sources.",
+    "detail_page": "Per-system obligations checklist grouped by duty-holder role; each obligation row shows legal basis, applicable date (with provisional/draft badge), obligation type (one-off vs recurring), and a link into Module 13 evidence assessment.",
+    "disclaimer_footer": "This assessment is a readiness-support tool based on deterministic screening rules. It does not provide legal advice and should be reviewed by qualified legal or compliance professionals before decisions are made.",
+    "cross_module_consistency_warning": "Flag when an upstream 'needs review'/uncertain status (e.g. Module 7 high-risk classification, Module 3 AI-system gate, Module 9 reclassification) undermines the obligation set — e.g. 'The high-risk classification this matrix relies on is still marked needs review; obligations shown may change.'"
+  },
+
+  "uncertain": [
+    "applicable_from_date (all high-risk rows: 2027-12-02 Annex III / 2028-08-02 Annex I rest on the unadopted Digital Omnibus)",
+    "guidance_status (high-risk rows = provisional; Article 6(3) row = draft pending 2026-05-19 guidelines)",
+    "reclassification_trigger_flags (substantial_modification, rebranded, purpose_changed_to_high_risk — set per system by Module 9)",
+    "registration_required.non_public_variant_law_enforcement_migration_border",
+    "standards_conformity_route.route",
+    "GPAI systemic-risk designation criteria beyond the 10^25 FLOP threshold",
+    "Whether AI literacy (Art 4) remains a firm organisational obligation under the final Digital Omnibus text",
+    "Exact high-risk classification boundaries pending finalisation of the 2026-05-19 draft Commission guidelines"
+  ]
+}
