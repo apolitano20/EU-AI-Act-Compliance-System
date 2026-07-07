@@ -13,6 +13,7 @@ import { LITERACY_QUESTIONS } from "./ai-literacy/literacyRules";
 import { RECLASSIFICATION_QUESTIONS } from "./reclassification/reclassificationRules";
 import { GPAI_QUESTIONS } from "./gpai/rules";
 import { TRANSPARENCY_QUESTIONS } from "./transparency/rules";
+import { OBLIGATION_QUESTIONS } from "./obligations/obligationRules";
 
 export type ModuleKey =
   | "eu-scope"
@@ -47,6 +48,7 @@ export const MODULES: Partial<Record<ModuleKey, ModuleDefinition>> = {
   reclassification: { title: "Value-Chain Reclassification", route: "/reclassification", questions: RECLASSIFICATION_QUESTIONS },
   gpai: { title: "GPAI Obligations", route: "/gpai", questions: GPAI_QUESTIONS },
   transparency: { title: "Transparency Obligations", route: "/transparency", questions: TRANSPARENCY_QUESTIONS },
+  obligations: { title: "Obligations Matrix", route: "/obligations", questions: OBLIGATION_QUESTIONS },
 };
 
 export function getModuleDefinition(moduleKey: string): ModuleDefinition | undefined {

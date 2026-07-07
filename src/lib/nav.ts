@@ -34,6 +34,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "AI Literacy", href: "/ai-literacy" },
       { label: "Transparency", href: "/transparency" },
+      { label: "Obligations Matrix", href: "/obligations" },
     ],
   },
 ];

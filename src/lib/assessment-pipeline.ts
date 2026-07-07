@@ -23,6 +23,7 @@ import { buildLiteracyAssessment, deriveLiteracyAnswers, LITERACY_QUESTIONS, typ
 import { buildReclassificationAssessment, deriveReclassificationAnswers, RECLASSIFICATION_QUESTIONS, type ReclassificationAssessment } from "@/lib/reclassification/reclassificationRules";
 import { buildGpaiAssessment, deriveGpaiAnswers, GPAI_QUESTIONS, type GpaiAssessment } from "@/lib/gpai/rules";
 import { buildTransparencyAssessment, deriveTransparencyAnswers, TRANSPARENCY_QUESTIONS, type TransparencyAssessment } from "@/lib/transparency/rules";
+import { applyReclassification, buildObligationAssessment, OBLIGATION_QUESTIONS, type ObligationContext, type ObligationMatrixAssessment } from "@/lib/obligations/obligationRules";
 
 export type SystemWithAssessments = AISystem & {
   roleAssessment: EntityRoleAssessment | null;
@@ -61,6 +62,10 @@ export interface AssessmentBundle {
   /** Module 11 — transparency (Art 50) + FRIA (Art 27). */
   transparencyAnswers: ModuleAnswers;
   transparency: TransparencyAssessment;
+  /** Module 12 — obligations matrix (pure aggregation of Modules 2-11). */
+  obligationAnswers: ModuleAnswers;
+  obligationContext: ObligationContext;
+  obligations: ObligationMatrixAssessment;
 }
 
 /** Stored answers for one module, or {} when nothing was saved. */
@@ -175,13 +180,50 @@ export function computeAssessmentBundle(system: SystemWithAssessments): Assessme
     roleConfidenceLabel: role.confidenceLabel,
   });
 
+  // Module 12 — obligations matrix (aggregates everything above).
+  const obligationAnswers: ModuleAnswers = {
+    ...deriveObligationAnswers(scopeAnswers, highRisk.carveOutApplied, reclassification.anyTriggerFired),
+    ...storedModuleAnswers(system, "obligations", OBLIGATION_QUESTIONS),
+  };
+  const obligationContext: ObligationContext = {
+    effectiveRoles: applyReclassification(role.likelyRoles, reclassification.anyTriggerFired),
+    promotedByReclassification: reclassification.anyTriggerFired,
+    definitionClassification: definition.classification,
+    scopeStatus: scope.status,
+    fullyExcluded: exclusions.fullExclusion,
+    exclusionStatus: exclusions.status,
+    prohibitedStatus: prohibited.status,
+    highRiskStatus: highRisk.status,
+    highRiskRegistrationRequired: highRisk.registrationRequired,
+    carveOutApplied: highRisk.carveOutApplied,
+    authorisedRepRequired: scope.authorisedRepRequired,
+    literacyApplies: literacy.status === "obligation_likely_applies",
+    art50TriggerIds: transparency.article50Rules.map((r) => r.ruleId),
+    friaStatus: transparency.friaStatus,
+    gpaiProvider: gpai.isGpaiProvider,
+    gpaiSystemicRisk: gpai.systemicRisk,
+    matchedAnnexIiiAreas: highRisk.matchedAnnexIiiAreas,
+  };
+  const obligations = buildObligationAssessment(obligationContext, obligationAnswers);
+
   return {
     system, normalized, roleAnswers, role, definition,
     scopeAnswers, scope, exclusionAnswers, exclusions,
     prohibitedAnswers, prohibited, highRiskAnswers, highRisk,
     literacyAnswers, literacy, reclassificationAnswers, reclassification,
     gpaiAnswers, gpai, transparencyAnswers, transparency,
+    obligationAnswers, obligationContext, obligations,
   };
+}
+
+/** Matrix-specific answer seeding from upstream results. */
+function deriveObligationAnswers(scopeAnswers: ModuleAnswers, carveOutApplied: boolean, promoted: boolean): ModuleAnswers {
+  const d: ModuleAnswers = { roleScope: "All roles held" };
+  if (scopeAnswers.establishment === "Established in the EU/EEA") d.establishedOutsideEu = "No";
+  if (scopeAnswers.establishment === "Established in a third country (outside EU/EEA)") d.establishedOutsideEu = "Yes";
+  if (!carveOutApplied) d.art63Documented = "Not applicable (system is high-risk)";
+  if (promoted) d.changedSinceMarket = "Yes";
+  return d;
 }
 
 export async function loadSystemsWithAssessments(): Promise<SystemWithAssessments[]> {
