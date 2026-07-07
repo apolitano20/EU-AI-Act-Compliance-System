@@ -60,7 +60,7 @@ export type NormalizedAISystemFormData = Omit<AISystemFormData, ArrayFieldName> 
 
 export type AISystemMutationData = Omit<
   Prisma.AISystemCreateInput,
-  "id" | "createdAt" | "updatedAt" | "roleAssessment" | "moduleAssessments"
+  "id" | "createdAt" | "updatedAt" | "roleAssessment" | "moduleAssessments" | "remediationItems"
 >;
 
 type AISystemLike = Partial<Record<keyof AISystemFormData, unknown>>;

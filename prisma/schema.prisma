@@ -71,6 +71,7 @@ model AISystem {
 
   roleAssessment    EntityRoleAssessment?
   moduleAssessments ModuleAssessment[]
+  remediationItems  RemediationItem[]
 }
 
 model EntityRoleAssessment {
@@ -100,4 +101,37 @@ model ModuleAssessment {
   system AISystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
 
   @@unique([systemId, moduleKey])
+}
+
+// Module 14 — remediation tracker. One row per system x obligation gap
+// (generated from Module 13). Regeneration upserts, preserving owner/dueDate/
+// status; completing a recurring item re-arms it (lastCompletedAt/nextDueAt)
+// instead of closing it.
+model RemediationItem {
+  id                   String    @id @default(cuid())
+  systemId             String
+  obligationId         String // "OBL-ART11-TECHDOC" etc.
+  title                String
+  sourceGapStatus      String // Module 13 readiness snapshot at generation
+  owner                String? // null = unassigned
+  dueDate              DateTime?
+  suggestedDueDate     DateTime?
+  recurrenceKind       String // one_off | one_off_then_recurring | recurring
+  cadence              String? // monthly|quarterly|semi_annually|annually|event_driven|custom
+  status               String    @default("open") // open|in_progress|blocked|completed|verified|deferred|not_applicable
+  priority             String // critical|high|medium|low
+  priorityOverridden   Boolean   @default(false)
+  lastCompletedAt      DateTime?
+  nextDueAt            DateTime?
+  legalBasisCitation   String
+  applicableFromDate   String?
+  guidanceStatus       String // final|provisional|draft
+  notes                String?
+  generatedFromRoleSet String? // role snapshot -> Module 9 staleness banner
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  system AISystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+
+  @@unique([systemId, obligationId])
 }
