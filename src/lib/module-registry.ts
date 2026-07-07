@@ -9,6 +9,8 @@ import { SCOPE_QUESTIONS } from "./eu-scope/scopeRules";
 import { EXCLUSION_QUESTIONS } from "./exclusions/exclusionRules";
 import { PROHIBITED_QUESTIONS } from "./prohibited/rules";
 import { HIGH_RISK_QUESTIONS } from "./high-risk/rules";
+import { LITERACY_QUESTIONS } from "./ai-literacy/literacyRules";
+import { RECLASSIFICATION_QUESTIONS } from "./reclassification/reclassificationRules";
 
 export type ModuleKey =
   | "eu-scope"
@@ -39,6 +41,8 @@ export const MODULES: Partial<Record<ModuleKey, ModuleDefinition>> = {
   exclusions: { title: "Exclusions", route: "/exclusions", questions: EXCLUSION_QUESTIONS },
   prohibited: { title: "Prohibited AI Practices", route: "/prohibited", questions: PROHIBITED_QUESTIONS },
   "high-risk": { title: "High-Risk Classification", route: "/high-risk", questions: HIGH_RISK_QUESTIONS },
+  "ai-literacy": { title: "AI Literacy", route: "/ai-literacy", questions: LITERACY_QUESTIONS },
+  reclassification: { title: "Value-Chain Reclassification", route: "/reclassification", questions: RECLASSIFICATION_QUESTIONS },
 };
 
 export function getModuleDefinition(moduleKey: string): ModuleDefinition | undefined {

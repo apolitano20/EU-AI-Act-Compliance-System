@@ -25,6 +25,13 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Exclusions", href: "/exclusions" },
       { label: "Prohibited", href: "/prohibited" },
       { label: "High-Risk", href: "/high-risk" },
+      { label: "Reclassification", href: "/reclassification" },
+    ],
+  },
+  {
+    label: "Obligations",
+    items: [
+      { label: "AI Literacy", href: "/ai-literacy" },
     ],
   },
 ];

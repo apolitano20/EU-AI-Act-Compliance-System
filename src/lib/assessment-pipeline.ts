@@ -19,6 +19,8 @@ import { buildScopeAssessment, deriveScopeAnswers, SCOPE_QUESTIONS, type EuScope
 import { buildExclusionAssessment, deriveExclusionAnswers, EXCLUSION_QUESTIONS, type ExclusionAssessment } from "@/lib/exclusions/exclusionRules";
 import { buildProhibitedAssessment, deriveProhibitedAnswers, PROHIBITED_QUESTIONS, type ProhibitedAssessment } from "@/lib/prohibited/rules";
 import { buildHighRiskAssessment, deriveHighRiskAnswers, HIGH_RISK_QUESTIONS, type HighRiskAssessment } from "@/lib/high-risk/rules";
+import { buildLiteracyAssessment, deriveLiteracyAnswers, LITERACY_QUESTIONS, type LiteracyAssessment } from "@/lib/ai-literacy/literacyRules";
+import { buildReclassificationAssessment, deriveReclassificationAnswers, RECLASSIFICATION_QUESTIONS, type ReclassificationAssessment } from "@/lib/reclassification/reclassificationRules";
 
 export type SystemWithAssessments = AISystem & {
   roleAssessment: EntityRoleAssessment | null;
@@ -45,6 +47,12 @@ export interface AssessmentBundle {
   /** Module 7 — high-risk classification (Article 6, Annex I/III). */
   highRiskAnswers: ModuleAnswers;
   highRisk: HighRiskAssessment;
+  /** Module 8 — AI literacy (Article 4, horizontal). */
+  literacyAnswers: ModuleAnswers;
+  literacy: LiteracyAssessment;
+  /** Module 9 — value-chain reclassification (Article 25, authoritative trigger flags). */
+  reclassificationAnswers: ModuleAnswers;
+  reclassification: ReclassificationAssessment;
 }
 
 /** Stored answers for one module, or {} when nothing was saved. */
@@ -113,10 +121,40 @@ export function computeAssessmentBundle(system: SystemWithAssessments): Assessme
     changedIntendedPurpose: roleAnswers.changedIntendedPurpose,
   });
 
+  // Module 8 — AI literacy (horizontal: ignores Module 5/7 outcomes).
+  const literacyAnswers: ModuleAnswers = {
+    ...deriveLiteracyAnswers({ likelyRoles: role.likelyRoles, definitionClassification: definition.classification }),
+    ...storedModuleAnswers(system, "ai-literacy", LITERACY_QUESTIONS),
+  };
+  const literacy = buildLiteracyAssessment(literacyAnswers, {
+    likelyRoles: role.likelyRoles,
+    definitionClassification: definition.classification,
+    roleConfidenceLabel: role.confidenceLabel,
+    highRiskStatus: highRisk.status,
+  });
+
+  // Module 9 — value-chain reclassification (authoritative Art 25 trigger flags).
+  const reclassificationAnswers: ModuleAnswers = {
+    ...deriveReclassificationAnswers({
+      likelyRoles: role.likelyRoles,
+      rebrandedThirdPartySystem: roleAnswers.rebrandedThirdPartySystem,
+      substantiallyModifiedSystem: roleAnswers.substantiallyModifiedSystem,
+      changedIntendedPurpose: roleAnswers.changedIntendedPurpose,
+      highRiskStatus: highRisk.status,
+    }),
+    ...storedModuleAnswers(system, "reclassification", RECLASSIFICATION_QUESTIONS),
+  };
+  const reclassification = buildReclassificationAssessment(reclassificationAnswers, {
+    highRiskStatus: highRisk.status,
+    roleConfidenceLabel: role.confidenceLabel,
+    purposeChangeReported: roleAnswers.changedIntendedPurpose === "Yes",
+  });
+
   return {
     system, normalized, roleAnswers, role, definition,
     scopeAnswers, scope, exclusionAnswers, exclusions,
     prohibitedAnswers, prohibited, highRiskAnswers, highRisk,
+    literacyAnswers, literacy, reclassificationAnswers, reclassification,
   };
 }
 
