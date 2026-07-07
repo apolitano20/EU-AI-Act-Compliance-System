@@ -79,3 +79,26 @@
     @apply font-sans;
   }
 }
+/* Print / Save-as-PDF styles for the Module 15 report pages. */
+@media print {
+  nav,
+  .print-hide {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  main {
+    max-width: none;
+    padding: 0;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .rounded-lg,
+  table,
+  tr {
+    break-inside: avoid;
+  }
+}

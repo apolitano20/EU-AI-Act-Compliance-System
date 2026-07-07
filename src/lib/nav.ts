@@ -42,6 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "Evidence & Readiness", href: "/readiness" },
       { label: "Remediation", href: "/remediation" },
+      { label: "Report", href: "/report" },
     ],
   },
 ];
